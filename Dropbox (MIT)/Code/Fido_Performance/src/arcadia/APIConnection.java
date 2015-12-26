@@ -61,7 +61,7 @@ public class APIConnection {
 	 * @return 	String list of all listed loans if showAll is true and recent loans if showAll 
 	 * 			is false, in specified format
 	 */
-	private String getLoanListAsString(String contentType, boolean showAll) {
+	public String getLoanListAsString(String contentType, boolean showAll) {
 		URI uri = null;
 			try {
 				uri = new URIBuilder()
@@ -120,7 +120,7 @@ public class APIConnection {
           CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
                 List csvRecords = csvStringParser.getRecords();
                         for (int i=1;i< csvRecords.size(); i++) {
-							loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
+			loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
          }
          } catch (Exception e){
            System.out.println("Oops!  Another error in retrieveLoanList" + e);
@@ -130,7 +130,7 @@ public class APIConnection {
 			
 			}
 		}
-		return loanList;
+            return loanList;
 	} 
 	
 	/**

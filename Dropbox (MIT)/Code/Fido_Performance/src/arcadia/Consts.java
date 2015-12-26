@@ -10,26 +10,37 @@ public class Consts {
 
     public static final String SCHEME = "https";
     public static final String VERSION = "v1/";
-    public static final String HOST = "api-sandbox.api.lendingclub.com/api/investor/"+VERSION;
-    //public static final String HOST = "api-sandbox.api.lendingclub.com/api/investor/"+VERSION;
+    public static final String HOST = "api-sandbox.lendingclub.com/api/investor/"+VERSION;
+    //public static final String HOST = "api.lendingclub.com/api/investor/"+VERSION;
     public static final String LISTING_PATH = "loans/listing";
     public static final int SANDBOX_AID = 10698237;
-    public static final int C1_REAL_AID = 1647714;
-    public static final int C2_REAL_AID = 9366713;
-    public static final int CIDF_REAL_AID = 57853824;
-    public static final int CCYM1_REAL_AID = 000000000000000;
-    public static final int C2a_REAL_AID = 61698826;
+    public static final int C1_REAL_AID = SANDBOX_AID;
+    public static final int C2_REAL_AID = SANDBOX_AID;
+    public static final int CIDF_REAL_AID = SANDBOX_AID;
+    public static final int CCYM1_REAL_AID = SANDBOX_AID;
+    public static final int C2a_REAL_AID = SANDBOX_AID;
+    
+//    public static final int C1_REAL_AID = 1647714;
+//    public static final int C2_REAL_AID = 9366713;
+//    public static final int CIDF_REAL_AID = 57853824;
+//    public static final int CCYM1_REAL_AID = 000000000000000;
+//    public static final int C2a_REAL_AID = 61698826;
 
 //	public static final String C1_ORDER_PATH = "accounts/"+C1_REAL_AID+"/orders";
 //	public static final String C2_ORDER_PATH = "accounts/"+C2_REAL_AID+"/orders";
 //	public static final String CIDF_ORDER_PATH = "accounts/"+CIDF_REAL_AID+"/orders";
 //	public static final String REAL_TOKEN = "";
     public static final String SANDBOX_TOKEN = "xO5Ae0FwNxXciC4XPzLH6kt3U0A=";
-    public static final String C1_REAL_TOKEN = "";
-    public static final String C2_REAL_TOKEN = "";
-    public static final String C2a_REAL_TOKEN = "";
-    public static final String CIDF_REAL_TOKEN = "";
-    public static final String CCYM1_REAL_TOKEN = "";
+    public static final String C1_REAL_TOKEN = SANDBOX_TOKEN;
+    public static final String C2_REAL_TOKEN = SANDBOX_TOKEN;
+    public static final String C2a_REAL_TOKEN = SANDBOX_TOKEN;
+    public static final String CIDF_REAL_TOKEN = SANDBOX_TOKEN;
+    public static final String CCYM1_REAL_TOKEN = SANDBOX_TOKEN;
+//    public static final String C1_REAL_TOKEN = "";
+//    public static final String C2_REAL_TOKEN = "";
+//    public static final String C2a_REAL_TOKEN = "";
+//    public static final String CIDF_REAL_TOKEN = "";
+//    public static final String CCYM1_REAL_TOKEN = "";
 
     public static final String JSON = "application/json";
     public static final String XML = "application/xml";

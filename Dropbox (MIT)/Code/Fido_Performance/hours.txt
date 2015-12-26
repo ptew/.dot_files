@@ -1,0 +1,9 @@
+12/23/15 - 1 hour  - Looked through code. Discussed code and project with Jonathan
+
+12/25/15 - 3 hours - Setup project such that it could be run. 
+                   - Looked through code and changed it so it could be run safely.
+                   - Built logger that logged loans to csv file.
+                   - Next step is to finalize logging implementation and build benchmark
+                   - Want to test out JSON vs. CSV
+                   - Look into overhead of multithreading for Java
+                  
