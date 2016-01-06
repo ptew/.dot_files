@@ -80,7 +80,7 @@ public class LoanLogger {
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
         
-        File file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/log.csv");
+        File file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/log-2.csv");
         try {
         // if file doesnt exists, then create it
         if (!file.exists()) {

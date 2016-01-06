@@ -1,0 +1,18 @@
+1. Why skip scoring and sorting of loans?
+
+2. Proucer consumer logic is good. Maybe can be improved. It might be a bit overkill.
+
+3. New loan logic. Just based on counts. How does that work?
+
+4. Only filter?
+
+5. How often is it that at a new loan listing time we only get a percentage of the loans?
+
+6. Bug for buying 100% might be from two buying pieces in the code.
+  - not setting the buy value correctly
+  - cirrix1
+
+7. How is the code run when you are going to start buying?
+
+8. Why is Cirrix1 different?
+

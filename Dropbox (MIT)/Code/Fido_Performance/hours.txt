@@ -7,3 +7,14 @@
                    - Want to test out JSON vs. CSV
                    - Look into overhead of multithreading for Java
                   
+12/25/15 - 2 hours - Refactored code.
+                   - Got timing results. CSV is about 30 percent faster for parsing.
+                      - ~60 ms vs ~90 ms for JSON
+                   - Tried speeding up requests by offloading URI creation to constructor
+
+01/04/16 - 2 hours - Looked over LoanRetriever and LoanOrderer in detail
+                   - Looked over logs to look at areas of improvement
+                   - Designed new system to combine LoanRetriever and LoanOrdered to reduce order latency
+
+01/06/16 - 2 hours - Researched Cirrix1 vs non-Cirix1 differences 
+                   - Meeting with Jonathan
