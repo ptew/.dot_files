@@ -80,7 +80,7 @@ public class LoanLogger {
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
         
-        File file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/log-2.csv");
+        File file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/log-"+ getTimeBlock(cal) + ".csv");
         try {
         // if file doesnt exists, then create it
         if (!file.exists()) {
@@ -93,102 +93,7 @@ public class LoanLogger {
         bw.close();
         }
         catch (IOException e) {
-			e.printStackTrace();
+            e.printStackTrace();
         }
-//        log.info("Loan List: " + api.getLoanListAsString(contentType, true));
-//        Filter filt = new Filter(Consts.C1_MIN_INCOME, Consts.C1_DTI_INQ_FICO, Consts.C1_FICO_INQUIRIES_CHECK, Consts.C1_STATE_LOAN_AMOUNT_CHECK, Consts.C1_FICO_LOAN_CHECK, params.TERM_SUBGRADE_CHECK, Consts.C1_INVALID_GRADES, Consts.C1_INVALID_PURPOSES, Consts.C1_EMP_LENGTH_MIN, Consts.C1_DTI_MAX, Consts.C1_DTI_TERM_CHECK, Consts.C1_FICO_LOW_THRESHHOLD, isWholeValid, isFractionalValid, is36Valid, is60Valid, params.creditModel);
-//        Scorer scorer = new Scorer(Consts.C2_INQUIRIES_BONUSES, Consts.C2_FICO_BONUSES, Consts.C2_USAGE_BONUSES, Consts.C2_STATE_BONUSES, Consts.C2_GRADE_BONUSES, Consts.C2_TERM_BONUSES, Consts.C1_WILL_COMPETE_BONUS);
-//        Log4JStopWatch stopwatch = new Log4JStopWatch(log);
-
-
-        /////////////////////////////////////////////////////////////////////
-        /////////					  RETRIEVAL						/////////
-        /////////////////////////////////////////////////////////////////////
-//        log.info("Purchase Limit: " + purchaseTarget);
-//        log.info("Wait for new listings?: " + params.watch);
-//        log.info("Restrict order to 36M loans?: " + params.termAllowance);
-//        log.info("Credit models: " + params.creditModel);
-//        log.info("Excluded 36M subgrades: " + params.INVALID_SUBGRADES_36);
-//        log.info("Excluded 60M subgrades: " + params.INVALID_SUBGRADES_60);
-//        log.info("Invalid purposes: " + Consts.C1_INVALID_PURPOSES);
-//        log.info("Loans retrieved using contentType: " + contentType);	
-//        LoanList initialPool = api.retrieveLoanList(contentType, true);
-//        log.info("Before new loans load, initial pool size = "+initialPool.getLoanCount());
-//        LoanList completePool = new LoanList(new LinkedList<Loan>());
-//        int investedNotes=0;
-//
-//        if (watchForNew == true) {	
-//            //set up multithreading system
-//            LoanList alreadyOrdered = new LoanList(new LinkedList<Loan>());
-//            List<OrderConfirmation> confirmations = new ArrayList<OrderConfirmation>();
-//            BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<LoanList>();
-//            BlockingQueue<LoanList> recycleQueue = new LinkedBlockingQueue<LoanList>();
-//            LoanRetriever retriever = new LoanRetriever(api, initialPool.getLoanCount(), retrievalQueue, Consts.C1_WATCH_ITERATIONS, log);
-//            LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, recycleQueue, filt, scorer, alreadyOrdered, confirmations, availableCash, Consts.PARTIAL_FRACTION, Consts.C1_PREORDER_THRESHHOLD, log, contentType);
-//            Thread retrieverThread = new Thread(retriever);
-//            Thread ordererThread = new Thread(orderer);
-//
-//            //start threads
-//            retrieverThread.start();
-//            ordererThread.start();
-//
-//            //wait for threads to close
-//            try {
-//                    retrieverThread.join();
-//                    ordererThread.join();
-//            } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//
-//            }
-//
-//            log.info("Back to main thread!");
-//            log.info("Checking results from the watching threads...");
-//            double cashSpent = 0;
-//            for (OrderConfirmation oc : confirmations){
-//                if (oc.getInvestedAmount()>0){
-//                    availableCash-=oc.getInvestedAmount();
-//                    cashSpent+=oc.getInvestedAmount();
-//                    investedNotes++;
-//                }
-//            }
-//            log.info("Total pre-order summary: $"+cashSpent+" on "+investedNotes+" notes.");
-//            log.info("$"+availableCash+" remaining...");
-//
-//            //grab all loans on the recycle queue
-//            List<LoanList> allLoanLists = new ArrayList<LoanList>();
-//            recycleQueue.drainTo(allLoanLists);
-//            for (LoanList ll : allLoanLists){
-//                completePool.merge(ll);
-//            }
-//            completePool.removeLoanList(alreadyOrdered);
-//        } else {
-//            completePool = initialPool;
-//        }
-//
-//        //order the loans
-//        log.info("Compiled complete listing; "+completePool.getLoanCount()+" loans retrieved");
-//        completePool.filter(filt);
-//        log.info("Filtered. "+completePool.getLoanCount()+" loans left");
-//        completePool.scoreAllLoans(scorer, Consts.C1_MIN_SCORE_CUTOFF);
-//        log.info("Scored. "+completePool.getLoanCount()+" loans left");
-//        completePool.sortLoans();
-//        log.info("Sorted. After sorting, we have developed the following prioritized list of "+completePool.getLoanCount()+" desirable loans.");
-//        if (completePool.getLoanCount()>0){
-//            log.info(completePool);
-//            completePool.setRequestAmounts(Consts.PARTIAL_FRACTION, availableCash);
-//            String orderRequest = api.formatOrderRequest(completePool);
-//            log.info("Will now call api.placeOrder(). Number of requested loans = " + StringUtils.countMatches(orderRequest, "loanId"));
-//            String confirmation = api.placeOrder(orderRequest, contentType);
-//            List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmation, contentType);
-//            for (OrderConfirmation oc : ocList){
-//                log.info(oc.toString());
-//                if (oc.getInvestedAmount()>0){
-//                    availableCash-=oc.getInvestedAmount();
-//                    investedNotes++;
-//                }
-//            }
-//        }
-//
-//        log.info("Run completed. $"+(purchaseTarget-availableCash)+" spent in "+investedNotes+" notes.");
     }
 }

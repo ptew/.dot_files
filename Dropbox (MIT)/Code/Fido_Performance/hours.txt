@@ -18,3 +18,12 @@
 
 01/06/16 - 2 hours - Researched Cirrix1 vs non-Cirix1 differences 
                    - Meeting with Jonathan
+                   - TODO:
+                        - Remove Consumer/Producer from Cirrix1
+                        - Look for bug in Cirrix1 with wrong buy percentage
+                        - Investigate JSON vs CSV networking timing differences
+                        - Build custom JSON or CSV parser depending on which is faster
+                        - Build Multiple Retriever / One Orderer type system
+                            - Use Buffered Queue for one version
+                            - Use vanilla array with synchronized flag for another
+                       
