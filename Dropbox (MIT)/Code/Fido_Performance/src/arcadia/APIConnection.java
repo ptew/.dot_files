@@ -109,7 +109,7 @@ public class APIConnection {
         getLoans.setHeader("Authorization",authToken);
         getLoans.setHeader("Connection", "keep-alive");
         ResponseHandler<String> rh = new BasicResponseHandler();
-
+        
         String loanListAsString = "";
         try {
             loanListAsString = client.execute(getLoans,rh);
@@ -118,6 +118,27 @@ public class APIConnection {
         }
 
         return loanListAsString;
+    }
+    
+    public String getLoanRetrievalTime(String contentType, boolean showAll) {
+        HttpGet getLoans = new HttpGet(this.listingURI);
+        getLoans.setHeader("Accept", contentType);
+        getLoans.setHeader("Authorization",authToken);
+        getLoans.setHeader("Connection", "keep-alive");
+        ResponseHandler<String> rh = new BasicResponseHandler();
+        
+        double time =0;
+        String loanListAsString = "";
+        try {
+            long start = System.currentTimeMillis();
+            loanListAsString = client.execute(getLoans,rh);
+            long end = System.currentTimeMillis();
+            time = (end - start)/1000.0;
+        } catch (Exception e) {
+            System.out.println("Failed to excute get loans from client." + e);
+        }
+
+        return Double.toString(time) + "," + loanListAsString.length() + "\n";
     }
 
     public LoanList retrieveLoanList(String contentType, boolean showAll){

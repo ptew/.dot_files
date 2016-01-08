@@ -27,3 +27,16 @@
                             - Use Buffered Queue for one version
                             - Use vanilla array with synchronized flag for another
                        
+01/07/16 - 2 hours - Discovered unused boolean showAll for getLoanAsString
+                   - Do you ever want to buy partial/Can you buy partial of a non Cirrix1 loan?
+                        - Should change setRequestAmounts to be more specialized
+                        - It is in the hot zone and should be as fast as possible
+                   - Is the bulk of buying just in one go?
+                   - Might want to make LoanList more low level
+                   - Made content timing script and sent results to Jonathan
+                        - CSV winner.
+                        - Now will move on to building low level parser for CSV
+
+01/08/16 - 1 hour - Java vs Curl experiment
+                       - Java code proved to be slightly faster over 50 trials
+                       - Emailed results to Jonathan

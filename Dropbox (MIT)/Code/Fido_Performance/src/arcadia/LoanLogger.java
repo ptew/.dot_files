@@ -40,7 +40,7 @@ public class LoanLogger {
         return df.format(cal.getTime());
     }
 //	
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException{
         //grab ordering parameters from configuration file, if it exists
         String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
         // String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
@@ -79,21 +79,67 @@ public class LoanLogger {
         System.setProperty("logfile.name", pathToLogs+cal.get(Calendar.YEAR)+"/"+Consts.MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.DATE)+"-"+getTimeBlock(cal)+".txt");
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
-        
-        File file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/log-"+ getTimeBlock(cal) + ".csv");
+        File file;
+        FileWriter fw;
+        BufferedWriter bw;
+        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/csv-timing.csv");
         try {
-        // if file doesnt exists, then create it
-        if (!file.exists()) {
-                file.createNewFile();
-        }
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                    file.createNewFile();
+            }
 
-        FileWriter fw = new FileWriter(file.getAbsoluteFile());
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(api.getLoanListAsString(contentType, true));
-        bw.close();
+            fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+            bw.write("Total Time,Response Length\n");
+            for (int i=0; i < 50; i++) {
+                bw.write(api.getLoanRetrievalTime(Consts.CSV, true));
+                Thread.sleep(1000);
+            }
+            bw.close();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+        
+//        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/json-timing.csv");
+//        try {
+//            // if file doesnt exists, then create it
+//            if (!file.exists()) {
+//                    file.createNewFile();
+//            }
+//
+//            fw = new FileWriter(file.getAbsoluteFile());
+//            bw = new BufferedWriter(fw);
+//            bw.write("Total Time,Response Length\n");
+//            for (int i=0; i < 3; i++) {
+//                bw.write(api.getLoanRetrievalTime(Consts.JSON, true));
+//                Thread.sleep(1000);
+//            }
+//            bw.close();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        
+//        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/xml-timing.csv");
+//        try {
+//            // if file doesnt exists, then create it
+//            if (!file.exists()) {
+//                    file.createNewFile();
+//            }
+//
+//            fw = new FileWriter(file.getAbsoluteFile());
+//            bw = new BufferedWriter(fw);
+//            bw.write("Total Time,Response Length\n");
+//            for (int i=0; i < 50; i++) {
+//                bw.write(api.getLoanRetrievalTime(Consts.XML, true));
+//                Thread.sleep(1000);
+//            }
+//            bw.close();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        } 
     }
 }
