@@ -73,7 +73,7 @@ public class APIConnection {
                     .setScheme(scheme)
                     .setHost(host)
                     .setPath(listingPath)
-                    .setParameter("showAll",String.valueOf(true))
+                    .setParameter("showAll",String.valueOf(false))
                     .build();
         } catch (URISyntaxException e) {
             System.out.println("Failed to create URI for listing." + e);
@@ -104,12 +104,16 @@ public class APIConnection {
      * 			is false, in specified format
      */
     public String getLoanListAsString(String contentType, boolean showAll) {
-        HttpGet getLoans = new HttpGet(this.listingURI);
-        getLoans.setHeader("Accept", contentType);
+        HttpGet getLoans;
+        if (showAll) {
+            getLoans = new HttpGet(this.showAllListingURI);
+        } else {
+            getLoans = new HttpGet(this.listingURI);
+        }        getLoans.setHeader("Accept", contentType);
         getLoans.setHeader("Authorization",authToken);
         getLoans.setHeader("Connection", "keep-alive");
-        ResponseHandler<String> rh = new BasicResponseHandler();
         
+        ResponseHandler<String> rh = new BasicResponseHandler();
         String loanListAsString = "";
         try {
             loanListAsString = client.execute(getLoans,rh);
@@ -121,7 +125,12 @@ public class APIConnection {
     }
     
     public String getLoanRetrievalTime(String contentType, boolean showAll) {
-        HttpGet getLoans = new HttpGet(this.listingURI);
+        HttpGet getLoans;
+        if (showAll) {
+            getLoans = new HttpGet(this.showAllListingURI);
+        } else {
+            getLoans = new HttpGet(this.listingURI);
+        }
         getLoans.setHeader("Accept", contentType);
         getLoans.setHeader("Authorization",authToken);
         getLoans.setHeader("Connection", "keep-alive");
@@ -140,46 +149,66 @@ public class APIConnection {
 
         return Double.toString(time) + "," + loanListAsString.length() + "\n";
     }
+    
+    public LoanList fastRetrieveLoanList(String contentType) {
+        String[] loanData = getLoanListAsString(contentType, true).replaceAll("\n", ",").replace("\"","").split(",");
+        LoanList loanList = null;
+        final int LOAN_DATA_LENGTH = 104; 
+        for (int x=0; x<100; ++x) {
+            loanList = new LoanList(new LinkedList<Loan>());
+            for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
+                loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
+            }
+        }
+ 
+        return loanList;
+    }
 
     public LoanList retrieveLoanList(String contentType, boolean showAll){
         String listAsString = getLoanListAsString(contentType, showAll);
-        LoanList loanList = new LoanList(new LinkedList<Loan>());
-        if (!listAsString.equals("")) {
-            switch (contentType) {
-                case "text/plain":
-                    try { 
-                        CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
-                        StringReader listAsReader = new StringReader(listAsString);
-                        CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
-                        List csvRecords = csvStringParser.getRecords();
-                        for (int i=1;i< csvRecords.size(); i++) {
-                            loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Couldn't parse CSV LoanList." + e);
-                    }
-                    break;
-                case "application/json":
-                    try {
-                        JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
-//                            String asOfDate = (String) obj.get("asOfDate");
-                        JSONArray loans = (JSONArray) obj.get("loans");
-                        if (loans!=null){
-                            for (int i =0; i < loans.size(); i++) {
-                                loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
+        LoanList loanList = null;
+        long start = System.currentTimeMillis();
+        for (int x=0; x<100; ++x) {
+            loanList = new LoanList(new LinkedList<Loan>());
+            if (!listAsString.equals("")) {
+                switch (contentType) {
+                    case "text/plain":
+                        try {
+
+                            CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
+                            StringReader listAsReader = new StringReader(listAsString);
+                            CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
+                            List csvRecords = csvStringParser.getRecords();
+                            for (int i=1;i< csvRecords.size(); i++) {
+                                loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
                             }
+                        } catch (Exception e) {
+                            System.out.println("Couldn't parse CSV LoanList." + e);
                         }
-                    } catch (ClassCastException e) {
-                        System.out.println("Couldn't parse JSON LoanList." + e);
-                    }
-                    break;
-                case "application/xml":
-                    break;
+                        break;
+                    case "application/json":
+                        try {
+                            JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
+    //                            String asOfDate = (String) obj.get("asOfDate");
+                            JSONArray loans = (JSONArray) obj.get("loans");
+                            if (loans!=null){
+                                for (int i =0; i < loans.size(); i++) {
+                                    loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
+                                }
+                            }
+                        } catch (ClassCastException e) {
+                            System.out.println("Couldn't parse JSON LoanList." + e);
+                        }
+                        break;
+                    case "application/xml":
+                        break;
+                }
             }
         }
-
+        long end = System.currentTimeMillis();
+//        System.out.println("Avg time for slow: " + (end - start)/100000.0);
         return loanList;
-    } 
+    }
 
     /**
      * signal that we are watching the loan listings for new loans on multiple threads

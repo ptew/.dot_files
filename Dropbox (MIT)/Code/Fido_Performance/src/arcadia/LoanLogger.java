@@ -79,28 +79,32 @@ public class LoanLogger {
         System.setProperty("logfile.name", pathToLogs+cal.get(Calendar.YEAR)+"/"+Consts.MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.DATE)+"-"+getTimeBlock(cal)+".txt");
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
-        File file;
-        FileWriter fw;
-        BufferedWriter bw;
-        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/csv-timing.csv");
-        try {
-            // if file doesnt exists, then create it
-            if (!file.exists()) {
-                    file.createNewFile();
-            }
-
-            fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
-            bw.write("Total Time,Response Length\n");
-            for (int i=0; i < 50; i++) {
-                bw.write(api.getLoanRetrievalTime(Consts.CSV, true));
-                Thread.sleep(1000);
-            }
-            bw.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        LoanList fast = api.fastRetrieveLoanList(contentType);
+        LoanList slow = api.retrieveLoanList(contentType, true);
+        slow.removeLoanList(fast);
+        assert(slow.getLoanCount()==0);
+//        System.out.println(api.getLoanListAsString(contentType, true));
+//        File file;
+//        FileWriter fw;
+//        BufferedWriter bw;
+//        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/show-all-false.csv");
+//        try {
+//            // if file doesnt exists, then create it
+//            if (!file.exists()) {
+//                    file.createNewFile();
+//            }
+//
+//            fw = new FileWriter(file.getAbsoluteFile());
+//            bw = new BufferedWriter(fw);
+//            bw.write("Total Time,Response Length\n");
+//            
+//            bw.write(api.getLoanListAsString(Consts.CSV, true));
+//            
+//            bw.close();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
         
 //        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/json-timing.csv");
 //        try {

@@ -52,22 +52,23 @@ public class LoanOrderer implements Runnable{
 					if (currentOrder.getLoanCount() > 0){
 						currentOrder.setRequestAmounts(fractionalMax, availableCash);
 						String orderRequest = api.formatOrderRequest(currentOrder);
-						log.info("Consumer has selected "+currentOrder.getLoanCount()+" loans for pre-order");
-                                                log.info("Loans selected for order: " + currentOrder);
-//						log.info("Order request: "+orderRequest);
-/////////////////////////////////////////////////////////////////////////////////////////////////////                                                
-//This block had been commented out by DZ.  I am making it active 8/24 at 11:14am
-                                                String confirmationString = api.placeOrder(orderRequest, contentType);
-//						log.info("Confirmation: "+confirmationString);
-						List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmationString, contentType);
-						for (OrderConfirmation oc : ocList){
-                                                    log.info(oc.toString());
-							if (oc.getInvestedAmount()>0){
-								availableCash-=oc.getInvestedAmount();
-								alreadyOrdered.addLoan(currentOrder.getLoanFromID(oc.getLoanID()));
-								confirmations.add(oc);
-							}
-						}
+                                                System.out.println("Would be placeing order");
+//						log.info("Consumer has selected "+currentOrder.getLoanCount()+" loans for pre-order");
+//                                                log.info("Loans selected for order: " + currentOrder);
+////						log.info("Order request: "+orderRequest);
+///////////////////////////////////////////////////////////////////////////////////////////////////////                                                
+////This block had been commented out by DZ.  I am making it active 8/24 at 11:14am
+//                                                String confirmationString = api.placeOrder(orderRequest, contentType);
+////						log.info("Confirmation: "+confirmationString);
+//						List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmationString, contentType);
+//						for (OrderConfirmation oc : ocList){
+//                                                    log.info(oc.toString());
+//							if (oc.getInvestedAmount()>0){
+//								availableCash-=oc.getInvestedAmount();
+//								alreadyOrdered.addLoan(currentOrder.getLoanFromID(oc.getLoanID()));
+//								confirmations.add(oc);
+//							}
+//						}
 //end of this pre-order block that was commented out by DZ.
 /////////////////////////////////////////////////////////////////////////////////////////////////////                                                                                               
 					}else{

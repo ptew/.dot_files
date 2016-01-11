@@ -14,13 +14,13 @@ public class Consts {
     //public static final String HOST = "api.lendingclub.com/api/investor/"+VERSION;
     public static final String LISTING_PATH = "loans/listing";
     public static final int SANDBOX_AID = 10698237;
-    public static final int C1_REAL_AID = SANDBOX_AID;
+//    public static final int C1_REAL_AID = SANDBOX_AID;
     public static final int C2_REAL_AID = SANDBOX_AID;
     public static final int CIDF_REAL_AID = SANDBOX_AID;
     public static final int CCYM1_REAL_AID = SANDBOX_AID;
     public static final int C2a_REAL_AID = SANDBOX_AID;
     
-//    public static final int C1_REAL_AID = 1647714;
+    public static final int C1_REAL_AID = 1647714;
 //    public static final int C2_REAL_AID = 9366713;
 //    public static final int CIDF_REAL_AID = 57853824;
 //    public static final int CCYM1_REAL_AID = 000000000000000;

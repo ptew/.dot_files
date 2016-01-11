@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.log4j.Logger;
@@ -35,7 +36,7 @@ public class Cirrix1MR {
         return df.format(cal.getTime());
     }
 	
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException{
         //grab ordering parameters from configuration file, if it exists
         String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
 //        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
@@ -101,18 +102,35 @@ public class Cirrix1MR {
             List<OrderConfirmation> confirmations = new ArrayList<OrderConfirmation>();
             BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<LoanList>();
             BlockingQueue<LoanList> recycleQueue = new LinkedBlockingQueue<LoanList>();
-            LoanRetriever retriever = new LoanRetriever(api, initialPool.getLoanCount(), retrievalQueue, Consts.C1_WATCH_ITERATIONS, log);
+            AtomicBoolean atomicFlag = new AtomicBoolean(false);
+            LoanRetriever retriever = new LoanRetriever(api, initialPool.getLoanCount(), retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, atomicFlag);
             LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, recycleQueue, filt, scorer, alreadyOrdered, confirmations, availableCash, Consts.PARTIAL_FRACTION, Consts.C1_PREORDER_THRESHHOLD, log, contentType);
-            Thread retrieverThread = new Thread(retriever);
+            Thread retrieverThreadOne = new Thread(retriever);
+            Thread retrieverThreadTwo = new Thread(retriever);
+            Thread retrieverThreadThree = new Thread(retriever);
+            Thread retrieverThreadFour = new Thread(retriever);
+            Thread retrieverThreadFive = new Thread(retriever);
             Thread ordererThread = new Thread(orderer);
 
             //start threads
-            retrieverThread.start();
             ordererThread.start();
+            retrieverThreadOne.start();
+            Thread.sleep(100);
+            retrieverThreadTwo.start();
+            Thread.sleep(100);
+            retrieverThreadThree.start();
+            Thread.sleep(100);
+            retrieverThreadFour.start();
+            Thread.sleep(100);
+            retrieverThreadFive.start();
 
             //wait for threads to close
             try {
-                retrieverThread.join();
+                retrieverThreadOne.join();
+                retrieverThreadTwo.join();
+                retrieverThreadThree.join();
+                retrieverThreadFour.join();
+                retrieverThreadFive.join();
                 ordererThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -146,26 +164,26 @@ public class Cirrix1MR {
         log.info("Compiled complete listing; "+completePool.getLoanCount()+" loans retrieved");
         completePool.filter(filt);
         log.info("Filtered. "+completePool.getLoanCount()+" loans left");
-        completePool.scoreAllLoans(scorer, Consts.C1_MIN_SCORE_CUTOFF);
-        log.info("Scored. "+completePool.getLoanCount()+" loans left");
-        completePool.sortLoans();
-        log.info("Sorted. After sorting, we have developed the following prioritized list of "+completePool.getLoanCount()+" desirable loans.");
-        if (completePool.getLoanCount()>0){
-            log.info(completePool);
-            completePool.setRequestAmounts(Consts.PARTIAL_FRACTION, availableCash);
-            String orderRequest = api.formatOrderRequest(completePool);
-//            log.info("Order request: "+orderRequest);
-            log.info("Will now call api.placeOrder(). Number of requested loans = " + StringUtils.countMatches(orderRequest, "loanId"));
-            String confirmation = api.placeOrder(orderRequest, contentType);
-            List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmation, contentType);
-            for (OrderConfirmation oc : ocList){
-                log.info(oc.toString());
-                  if (oc.getInvestedAmount()>0){
-                          availableCash-=oc.getInvestedAmount();
-                          investedNotes++;
-                  }
-            }   
-        }
+//        completePool.scoreAllLoans(scorer, Consts.C1_MIN_SCORE_CUTOFF);
+//        log.info("Scored. "+completePool.getLoanCount()+" loans left");
+//        completePool.sortLoans();
+//        log.info("Sorted. After sorting, we have developed the following prioritized list of "+completePool.getLoanCount()+" desirable loans.");
+//        if (completePool.getLoanCount()>0){
+//            log.info(completePool);
+//            completePool.setRequestAmounts(Consts.PARTIAL_FRACTION, availableCash);
+//            String orderRequest = api.formatOrderRequest(completePool);
+////            log.info("Order request: "+orderRequest);
+//            log.info("Will now call api.placeOrder(). Number of requested loans = " + StringUtils.countMatches(orderRequest, "loanId"));
+//            String confirmation = api.placeOrder(orderRequest, contentType);
+//            List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmation, contentType);
+//            for (OrderConfirmation oc : ocList){
+//                log.info(oc.toString());
+//                  if (oc.getInvestedAmount()>0){
+//                          availableCash-=oc.getInvestedAmount();
+//                          investedNotes++;
+//                  }
+//            }   
+//        }
         log.info("Run completed. $"+(purchaseTarget-availableCash)+" spent in "+investedNotes+" notes.");
     }
 }

@@ -37,6 +37,21 @@
                         - CSV winner.
                         - Now will move on to building low level parser for CSV
 
-01/08/16 - 1 hour - Java vs Curl experiment
+01/08/16 - 2 hours - Java vs Curl experiment
                        - Java code proved to be slightly faster over 50 trials
                        - Emailed results to Jonathan
+                       - Looked over the code for optimizations
+                       - Fixed a bug in my code that wasn't using the showall flag
+                       - Also, found http://lmax-exchange.github.io/disruptor/
+                            - Faster alternative to a Java Blocking Queue
+                       - Interesting Java for low latency panel
+                            - http://www.infoq.com/articles/low-latency-vp
+                       - There might be bug in the original way loans are parsed
+                            - Iteration loop starts with 1
+                            - Need to check the number of loans we should be getting from the raw data
+
+01/09/16 - 3 hours - Optimized CSV parser
+                        - Reduced parsing time from 0.01439 to 0.00305 for a set of loans
+                        - 78.8% speedup on this section of code
+                          
+                        
