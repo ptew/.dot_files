@@ -924,6 +924,7 @@ public class Loan implements Comparable<Loan>{
                 String TAB = "\t";
 		result.append("  ID: " + loanID + TAB);
 		result.append("  Amount: " + loanAmount + TAB);
+                result.append("  RequestAmount: " + reqAmount + TAB);
 		result.append(" " + addrState + TAB);
 		result.append("  Rate(%): " + this.intRate + TAB);
 		result.append("  " + this.term + " " + this.subgrade + TAB);

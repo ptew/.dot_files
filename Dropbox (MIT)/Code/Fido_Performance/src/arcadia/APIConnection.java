@@ -22,10 +22,7 @@ import net.minidev.json.*;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import static org.apache.commons.lang3.StringUtils.INDEX_NOT_FOUND;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import org.apache.http.Header;
 
 
 /**
@@ -86,7 +83,7 @@ public class APIConnection {
         }
         
         try {
-                this.orderURI = new URIBuilder()
+            this.orderURI = new URIBuilder()
                 .setScheme(scheme)
                 .setHost(host)
                 .setPath(orderPath)
@@ -94,11 +91,6 @@ public class APIConnection {
         } catch (URISyntaxException e) {
             System.out.println("Failed to create URI for order." + e);
         }
-        
-        this.httpOrder  = new HttpPost(this.orderURI);
-        this.httpOrder.setHeader("Accept", Consts.CSV);
-        this.httpOrder.setHeader("Authorization",authToken);
-        this.httpOrder.setHeader("Connection", "keep-alive");
     }
 
     /**
@@ -109,13 +101,14 @@ public class APIConnection {
      * @return 	String list of all listed loans if showAll is true and recent loans if showAll 
      * 			is false, in specified format
      */
-    public String getLoanListAsString(String contentType, boolean showAll) {
+    public String getLoanListAsString(boolean showAll) {
         HttpGet getLoans;
         if (showAll) {
             getLoans = new HttpGet(this.showAllListingURI);
         } else {
             getLoans = new HttpGet(this.listingURI);
-        }        getLoans.setHeader("Accept", contentType);
+        }        
+        getLoans.setHeader("Accept", Consts.CSV);
         getLoans.setHeader("Authorization",authToken);
         getLoans.setHeader("Connection", "keep-alive");
         
@@ -130,30 +123,26 @@ public class APIConnection {
         return loanListAsString;
     }
     
-    public String getLoanRetrievalTime(String contentType, boolean showAll) {
+    public String getLoanListAsString(String contentType, boolean showAll) {
         HttpGet getLoans;
         if (showAll) {
             getLoans = new HttpGet(this.showAllListingURI);
         } else {
             getLoans = new HttpGet(this.listingURI);
-        }
+        }        
         getLoans.setHeader("Accept", contentType);
         getLoans.setHeader("Authorization",authToken);
         getLoans.setHeader("Connection", "keep-alive");
-        ResponseHandler<String> rh = new BasicResponseHandler();
         
-        double time =0;
+        ResponseHandler<String> rh = new BasicResponseHandler();
         String loanListAsString = "";
         try {
-            long start = System.currentTimeMillis();
             loanListAsString = client.execute(getLoans,rh);
-            long end = System.currentTimeMillis();
-            time = (end - start)/1000.0;
         } catch (Exception e) {
             System.out.println("Failed to excute get loans from client." + e);
         }
 
-        return Double.toString(time) + "," + loanListAsString.length() + "\n";
+        return loanListAsString;
     }
     
     public static String remove(final String str, final char remove) {
@@ -185,54 +174,12 @@ public class APIConnection {
         return new String(chars, 0, chars.length);
     }
     
-    public String[] parseLoanCSVString(String loans) {
-        return loans.replaceAll("\"","").replaceAll("\r|\n", ",").split(",");
-    }
-    
     public String[] parseLoanCSVStringCustom(String loans) {
         return remove(replaceNewlines(loans), '"').split(",");
     }
     
-    public void parseOld(String listAsString, String contentType) {
-        LoanList loanList = new LoanList(new LinkedList<Loan>());
-        if (!listAsString.equals("")) {
-            switch (contentType) {
-                case "text/plain":
-                    try {
-
-                        CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
-                        StringReader listAsReader = new StringReader(listAsString);
-                        CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
-                        List csvRecords = csvStringParser.getRecords();
-                        for (int i=1;i< csvRecords.size(); i++) {
-                            loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Couldn't parse CSV LoanList." + e);
-                    }
-                    break;
-                case "application/json":
-                    try {
-                        JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
-//                            String asOfDate = (String) obj.get("asOfDate");
-                        JSONArray loans = (JSONArray) obj.get("loans");
-                        if (loans!=null){
-                            for (int i =0; i < loans.size(); i++) {
-                                loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
-                            }
-                        }
-                    } catch (ClassCastException e) {
-                        System.out.println("Couldn't parse JSON LoanList." + e);
-                    }
-                    break;
-                case "application/xml":
-                    break;
-            }
-        }
-    }
-    
-    public LoanList fastRetrieveLoanList(String contentType) {
-        String loans = getLoanListAsString(contentType, true);
+    private LoanList retrieveLoanList(boolean showAll) {
+        String loans = getLoanListAsString(showAll);
        
         String[] loanData = parseLoanCSVStringCustom(loans);
         LoanList loanList = new LoanList(new LinkedList<Loan>());;
@@ -243,6 +190,15 @@ public class APIConnection {
  
         return loanList;
     }
+    
+    public LoanList retrieveNewLoanList() {
+        return retrieveLoanList(false);
+    }
+    
+    public LoanList retrieveAllLoanList() {
+        return retrieveLoanList(true);
+    }
+    
     static String readFile(String path, Charset encoding) 
       throws IOException 
     {
@@ -250,14 +206,12 @@ public class APIConnection {
       return new String(encoded, encoding);
     }
     
-    public LoanList fastRetrieveLoanListFromCSV(String contentType, String filepath) {
-        
+    public LoanList retrieveLoanListFromCSV(String contentType, String filepath) {
         String[] loanData;
         LoanList loanList = new LoanList(new LinkedList<Loan>());
 
         try {
             loanData = readFile(filepath, StandardCharsets.UTF_8).replaceAll("\"","").replaceAll("\r|\n", ",").split(",");
-//            System.out.println(readFile(filepath, StandardCharsets.UTF_8).split("\r\n")[0]);
             final int LOAN_DATA_LENGTH = 104; 
             for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
                 loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
@@ -269,7 +223,7 @@ public class APIConnection {
         return loanList;
     }
 
-    public LoanList retrieveLoanList(String contentType, boolean showAll){
+    public LoanList oldRetrieveLoanList(String contentType, boolean showAll){
         String listAsString = getLoanListAsString(contentType, showAll);
         LoanList loanList = new LoanList(new LinkedList<Loan>());
         if (!listAsString.equals("")) {
@@ -291,7 +245,6 @@ public class APIConnection {
                 case "application/json":
                     try {
                         JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
-//                            String asOfDate = (String) obj.get("asOfDate");
                         JSONArray loans = (JSONArray) obj.get("loans");
                         if (loans!=null){
                             for (int i =0; i < loans.size(); i++) {
@@ -346,22 +299,15 @@ public class APIConnection {
         }
         
         String order = loanOrders.toString();
-        //delete the extra comma
+        // delete the extra comma
         if (!order.equals("")){
             order = order.substring(0, order.length()-1);
         }
         String postamble = "]}";
         return preamble+order+postamble;
     }
-
-    public String benchmarkPlaceOrder(String orderRequest, String  contentType) {
-        this.httpOrder.setEntity(new StringEntity(orderRequest, ContentType.TEXT_PLAIN));
-        ResponseHandler<String> rh = new BasicResponseHandler();
-        String orderConfirmationAsString = "";
-        return orderConfirmationAsString;
-    }
     
-    public String placeOrder(String orderRequest){
+    public String placeOrderCSV(String orderRequest){
         HttpPost placeOrder = new HttpPost(orderURI);
         placeOrder.setHeader("Accept", Consts.CSV);
         placeOrder.setHeader("Authorization",authToken);

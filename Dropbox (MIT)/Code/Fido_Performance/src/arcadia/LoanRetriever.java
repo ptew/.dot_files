@@ -5,7 +5,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Calendar;
 import java.util.logging.Level;
-
 import org.apache.log4j.Logger;
 
 public class LoanRetriever implements Runnable{
@@ -22,6 +21,7 @@ public class LoanRetriever implements Runnable{
         this.log = log;
         this.watchIterations = watchIterations;
         this.atomicFlag = atomicFlag;
+        
     }
 
     @Override
@@ -43,7 +43,7 @@ public class LoanRetriever implements Runnable{
                 LoanList ll = new LoanList(new LinkedList<Loan>());
                 
                 if (calendar.get(Calendar.SECOND) > 55) {
-                    ll = api.retrieveLoanList(Consts.CSV, true);
+                    ll = api.retrieveNewLoanList();
                 }
                 
                 if (ll.getLoanCount() > 0 && atomicFlag.compareAndSet(false, true)) {

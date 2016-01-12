@@ -1,45 +1,10 @@
 package arcadia;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import org.apache.commons.lang3.StringUtils;
-
 import org.apache.log4j.Logger;
-import org.perf4j.log4j.Log4JStopWatch;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+public class LoanLogger extends Cirrix {
 
-
-public class LoanLogger {
-    private static Logger log = null;
-    private static String contentType = Consts.CSV;
-
-    /**
-     * 
-     * @param cal
-     * @return Returns time period string for saving the log
-     */
-    private static String getTimeBlock(Calendar cal){
-        int hours = cal.get(Calendar.HOUR);
-        for (int i = 0; i<Consts.LISTING_TIMES.length; i++){
-                if (hours > Consts.LISTING_TIMES[i]-Consts.TIME_BUFFER && hours < Consts.LISTING_TIMES[i]+Consts.TIME_BUFFER){
-                        System.out.println("here");
-                        return Consts.LISTING_STRINGS[i];
-                }
-        }
-        DateFormat df = new SimpleDateFormat("HH.mm");
-        return df.format(cal.getTime());
-    }
-//	
     public static void main(String[] args) throws InterruptedException{
         //grab ordering parameters from configuration file, if it exists
         String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
@@ -50,28 +15,7 @@ public class LoanLogger {
         params.readFile();
 
         /////////////////////////////////////////////////////////////////////
-        /////////				 CONTROL PARAMETERS					/////////
-        /////////////////////////////////////////////////////////////////////
-        double purchaseTarget = params.orderMax;
-        double availableCash = purchaseTarget;
-        boolean watchForNew = false;
-//		if (params.watch.equals("YES")){ //"Do you want this ordering session to wait for the new listings?"
-//			watchForNew = true;
-//		}else if (params.watch.equals("NO")){
-//			watchForNew = false;
-//		}
-        boolean isWholeValid = true, isFractionalValid = false;
-        boolean is36Valid, is60Valid;
-        if (params.termAllowance.equals("YES")){ //"Do you want to restrict your oders to 36M loans?"
-                is36Valid=true;
-                is60Valid=false;
-        } else {                     
-                is36Valid=true;
-                is60Valid=true;
-        }
-
-        /////////////////////////////////////////////////////////////////////
-        /////////						SETUP						/////////
+        /////////                        SETUP			/////////
         /////////////////////////////////////////////////////////////////////
         System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
         String pathToLogs = Consts.PATH_TO_LOGS+LoanLogger.class.getName()+"/";
@@ -80,7 +24,7 @@ public class LoanLogger {
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
         String filepath = "/Users/ParkerTew/Dropbox (MIT)/Code/logs/realisticLoans/cirrix1-real.csv";
-        LoanList fast = api.fastRetrieveLoanListFromCSV(contentType, filepath);
+        LoanList fast = api.retrieveNewLoanList();
 //        LoanList slow = api.retrieveLoanList(contentType, true);
 //        slow.removeLoanList(fast);
 //        assert(slow.getLoanCount()==0);
