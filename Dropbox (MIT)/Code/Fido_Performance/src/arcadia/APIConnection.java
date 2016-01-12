@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 
 import org.apache.http.client.*;
@@ -162,6 +166,30 @@ public class APIConnection {
         }
  
         return loanList;
+    }
+    static String readFile(String path, Charset encoding) 
+      throws IOException 
+    {
+      byte[] encoded = Files.readAllBytes(Paths.get(path));
+      return new String(encoded, encoding);
+    }
+    
+    public LoanList fastRetrieveLoanListFromCSV(String contentType, String filepath) {
+        try {
+            String[] loanData = readFile(filepath, StandardCharsets.UTF_8).replaceAll("\n", ",").replace("\"","").split(",");
+            LoanList loanList = null;
+            final int LOAN_DATA_LENGTH = 104; 
+            for (int x=0; x<100; ++x) {
+                loanList = new LoanList(new LinkedList<Loan>());
+                for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
+                    loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
+                }
+            }
+
+            return loanList;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public LoanList retrieveLoanList(String contentType, boolean showAll){

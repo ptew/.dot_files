@@ -79,10 +79,11 @@ public class LoanLogger {
         System.setProperty("logfile.name", pathToLogs+cal.get(Calendar.YEAR)+"/"+Consts.MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.DATE)+"-"+getTimeBlock(cal)+".txt");
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
-        LoanList fast = api.fastRetrieveLoanList(contentType);
-        LoanList slow = api.retrieveLoanList(contentType, true);
-        slow.removeLoanList(fast);
-        assert(slow.getLoanCount()==0);
+        String filepath = "/Users/ParkerTew/Dropbox (MIT)/Code/logs/realisticLoans/cirrix1-real.csv";
+        LoanList fast = api.fastRetrieveLoanListFromCSV(contentType, filepath);
+//        LoanList slow = api.retrieveLoanList(contentType, true);
+//        slow.removeLoanList(fast);
+//        assert(slow.getLoanCount()==0);
 //        System.out.println(api.getLoanListAsString(contentType, true));
 //        File file;
 //        FileWriter fw;

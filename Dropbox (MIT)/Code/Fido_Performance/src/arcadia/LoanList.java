@@ -132,9 +132,9 @@ public class LoanList {
 	public void setRequestAmounts(double fractionalMax, double availableCash){
 		for (Loan l : loans){
 			double reqAmount = 0;
-			if (l.getInitialListStatus().equals("W")){
+			if (l.getInitialListStatus().equals("W")) {
 				reqAmount = l.getLoanAmount();
-			}else {
+			} else {
 				reqAmount = fractionalMax * l.getLoanAmount();
 			}
 			if (reqAmount<availableCash){

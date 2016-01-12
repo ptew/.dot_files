@@ -53,5 +53,11 @@
 01/09/16 - 3 hours - Optimized CSV parser
                         - Reduced parsing time from 0.01439 to 0.00305 for a set of loans
                         - 78.8% speedup on this section of code
+
+01/10/16 - 2 hours - Cirrix1MR allows for multiple retrievers
+                        - Tested by running threads and only retrieving
+                        - Got rid of buffered queue and using array and atomic boolean
+                        - Should just put all ordering logic in a wrap of the atomic boolean
                           
-                        
+01/10/16 - 1 hours - Jonathan Meeting
+                     
