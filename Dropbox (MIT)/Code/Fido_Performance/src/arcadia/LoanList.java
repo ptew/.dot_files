@@ -129,19 +129,26 @@ public class LoanList {
 	 * List must be ordered by score, and does not request more than availableCash
 	 * @return 
 	 */
-	public void setRequestAmounts(double fractionalMax, double availableCash){
-		for (Loan l : loans){
-			double reqAmount = 0;
-			if (l.getInitialListStatus().equals("W")) {
-				reqAmount = l.getLoanAmount();
-			} else {
-				reqAmount = fractionalMax * l.getLoanAmount();
-			}
-			if (reqAmount<availableCash){
-				l.setReqAmount(reqAmount);
-				availableCash-=reqAmount;
-			}
-		}
+	public void setFractionalRequestAmounts(double availableCash, double fractionalMax){
+            for (Loan l : loans){
+                double reqAmount = fractionalMax * l.getLoanAmount();
+
+                if (reqAmount<availableCash){
+                        l.setReqAmount(reqAmount);
+                        availableCash-=reqAmount;
+                }
+            }
+	}
+        
+        public void setRequestAmounts(double availableCash){
+            for (Loan l : loans){
+                double reqAmount = l.getLoanAmount();
+
+                if (reqAmount<availableCash){
+                        l.setReqAmount(reqAmount);
+                        availableCash-=reqAmount;
+                }
+            }
 	}
 	
 	

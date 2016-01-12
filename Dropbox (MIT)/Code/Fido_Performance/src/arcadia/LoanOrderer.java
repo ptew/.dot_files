@@ -50,7 +50,7 @@ public class LoanOrderer implements Runnable{
 //					currentOrder.scoreAllLoans(scorer, preorderThreshhold);
 //					currentOrder.sortLoans();
 					if (currentOrder.getLoanCount() > 0){
-						currentOrder.setRequestAmounts(fractionalMax, availableCash);
+						currentOrder.setFractionalRequestAmounts(availableCash,fractionalMax);
 						String orderRequest = api.formatOrderRequest(currentOrder);
                                                 System.out.println("Would be placeing order");
 //						log.info("Consumer has selected "+currentOrder.getLoanCount()+" loans for pre-order");

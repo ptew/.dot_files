@@ -37,7 +37,8 @@ public class Cirrix1 {
 	
     public static void main(String[] args){
         //grab ordering parameters from configuration file, if it exists
-        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
+//        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
+        String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
         String account = "C1_";
         Config params = new Config (configFile, account);
         params.readFile();
@@ -93,23 +94,28 @@ public class Cirrix1 {
         LoanList alreadyOrdered = new LoanList(new LinkedList<Loan>());
         int investedNotes=0;
         
-        
-        for (int t=0; t < Consts.C1_WATCH_ITERATIONS; t++) {	
+        final String filepath = "/Users/ParkerTew/Dropbox (MIT)/Code/logs/realisticLoans/cirrix1-real.csv";
+
+//        for (int t=0; t < Consts.C1_WATCH_ITERATIONS; t++) {	
+        for (int t=0; t < 1; t++) {	
             //set up multithreading system
-            currentOrder = api.retrieveLoanList(contentType, false);
+            long start = System.currentTimeMillis();
+            currentOrder = api.fastRetrieveLoanListFromCSV(contentType,filepath);
             currentOrder.removeLoanList(alreadyOrdered);
             log.info("t= "+t+" ; "+currentOrder.getLoanCount()+" new loans retrieved");
-            if (currentOrder.getLoanCount()>0) {
+            if (currentOrder.getLoanCount()>0) {            
                 currentOrder.filter(filt);
                 log.info("Filtered. "+currentOrder.getLoanCount()+" loans left");
                 log.info("No scoring or sorting. We have developed the following prioritized list of "+ currentOrder.getLoanCount()+" desirable loans.");
                 if (currentOrder.getLoanCount()>0) {
                     log.info(currentOrder);
-                    currentOrder.setRequestAmounts(Consts.PARTIAL_FRACTION, availableCash);
+                    currentOrder.setFractionalRequestAmounts(availableCash, Consts.PARTIAL_FRACTION);
                     String orderRequest = api.formatOrderRequest(currentOrder);
                     log.info("Cirrix1 has selected "+currentOrder.getLoanCount()+" loans for pre-order");
                     log.info("Loans selected for order: " + currentOrder);
                     String confirmationString = api.placeOrder(orderRequest, contentType);
+                    long end = System.currentTimeMillis();
+                    System.out.println("Hot time: " + (end - start)/100000.0);
                     List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmationString, contentType);
                     for (OrderConfirmation oc : ocList){
                         log.info(oc.toString());
@@ -118,9 +124,8 @@ public class Cirrix1 {
                             investedNotes++;
                             alreadyOrdered.addLoan(currentOrder.getLoanFromID(oc.getLoanID()));
                         }
-                    }
+                    }                  
                 }
-                 
             }
         }
         

@@ -157,7 +157,7 @@ public class Loan implements Comparable<Loan>{
         this.installment = Double.parseDouble(params[8]);
         this.grade = params[9];
         this.subgrade = params[10];
-        this.empLength = ("".equals(params[11])) ? 0 : Integer.parseInt(params[11]);
+        this.empLength = ("".equals(params[11].replaceAll("\\D+", ""))) ? 0 : Integer.parseInt(params[11].replaceAll("\\D+", ""));
         this.homeOwnership = params[12];
         this.annualInc = ("".equals(params[13])) ? 0 : Double.parseDouble(params[13]);    
         this.isIncV = params[14];
@@ -177,8 +177,8 @@ public class Loan implements Comparable<Loan>{
         this.ilsExpD = params[28];
         this.accNowDelinq = ("".equals(params[29])) ? 0 : Integer.parseInt(params[29]);
         this.accOpenPast24Mths = ("".equals(params[30])) ? 0 : Integer.parseInt(params[30]);
-        this.bcOpenToBuy = ("".equals(params[31])) ? 0 : Integer.parseInt(params[31]);
-        this.bcUtil = ("".equals(params[32])) ? 0 : Double.parseDouble(params[32]);
+        this.bcOpenToBuy = (params[31].trim().length() == 0) ? 0 : Integer.parseInt(params[31]);
+        this.bcUtil = (params[32].trim().length() == 0) ? 0 : Double.parseDouble(params[32]);
         this.dti = ("".equals(params[33])) ? 0 : Double.parseDouble(params[33]);
         this.delinq2Yrs = ("".equals(params[34])) ? 0 : Integer.parseInt(params[34]);
         this.delinqAmnt = ("".equals(params[35])) ? 0 : Double.parseDouble(params[35]);
@@ -186,28 +186,28 @@ public class Loan implements Comparable<Loan>{
         this.ficoRangeLow = ("".equals(params[37])) ? 0 : Integer.parseInt(params[37]);
         this.ficoRangeHigh = ("".equals(params[38])) ? 0 : Integer.parseInt(params[38]);
         this.inqLast6Mths = ("".equals(params[39])) ? 0 : Integer.parseInt(params[39]);
-        this.mthsSinceLastDelinq = ("".equals(params[40])) ? 0 : Integer.parseInt(params[40]);
-        this.mthsSinceLastRecord = ("".equals(params[41])) ? 0 : Integer.parseInt(params[41]);
-        this.mthsSinceRecentInq = ("".equals(params[42])) ? 0 : Integer.parseInt(params[42]);
-        this.mthsSinceRecentRevolDelinq = ("".equals(params[43])) ? 0 : Integer.parseInt(params[43]);
-        this.mthsSinceRecentBc = ("".equals(params[44])) ? 0 : Integer.parseInt(params[44]);
+        this.mthsSinceLastDelinq = (params[40].trim().length() == 0) ? 0 : Integer.parseInt(params[40]);
+        this.mthsSinceLastRecord = (params[41].trim().length() == 0) ? 0 : Integer.parseInt(params[41]);
+        this.mthsSinceRecentInq = (params[42].trim().length() == 0) ? 0 : Integer.parseInt(params[42]);
+        this.mthsSinceRecentRevolDelinq = (params[43].trim().length() == 0) ? 0 : Integer.parseInt(params[43]);
+        this.mthsSinceRecentBc = (params[44].trim().length() == 0) ? 0 : Integer.parseInt(params[44]);
         this.mortAcc = ("".equals(params[45])) ? 0 : Integer.parseInt(params[45]);
         this.openAcc = ("".equals(params[46])) ? 0 : Integer.parseInt(params[46]);
         this.pubRec = ("".equals(params[47])) ? 0 : Integer.parseInt(params[47]);
         this.totalBalExMort = ("".equals(params[48])) ? 0 : Integer.parseInt(params[48]);
         this.revolBal = ("".equals(params[49])) ? 0 : Double.parseDouble(params[49]);
-        this.revolUtil = ("".equals(params[50])) ? 0 : Double.parseDouble(params[50]);
+        this.revolUtil = (params[50].trim().length() == 0) ? 0 : Double.parseDouble(params[50]);
         this.totalBcLimit = ("".equals(params[51])) ? 0 : Integer.parseInt(params[51]);
         this.totalAcc = ("".equals(params[52])) ? 0 : Integer.parseInt(params[52]);
         this.totalIlHighCreditLimit = ("".equals(params[53])) ? 0 : Integer.parseInt(params[53]);
         this.numRevAccts = ("".equals(params[54])) ? 0 : Integer.parseInt(params[54]);
-        this.mthsSinceRecentBcDlq = ("".equals(params[55])) ? 0 : Integer.parseInt(params[55]);
+        this.mthsSinceRecentBcDlq = (params[55].trim().length() == 0) ? 0 : Integer.parseInt(params[55]);
         this.pubRecBankruptcies = ("".equals(params[56])) ? 0 : Integer.parseInt(params[56]);
         this.numAcctsEver120Ppd = ("".equals(params[57])) ? 0 : Integer.parseInt(params[57]);
         this.chargeoffWithin12Mths = ("".equals(params[58])) ? 0 : Integer.parseInt(params[58]);
         this.collections12MthsExMed = ("".equals(params[59])) ? 0 : Integer.parseInt(params[59]);
         this.taxLiens = ("".equals(params[60])) ? 0 : Integer.parseInt(params[60]);
-        this.mthsSinceLastMajorDerog = ("".equals(params[61])) ? 0 : Integer.parseInt(params[61]);
+        this.mthsSinceLastMajorDerog = ("".equals(params[61]) || "null".equals(params[61])) ? 0 : Integer.parseInt(params[61]);
         this.numSats = ("".equals(params[62])) ? 0 : Integer.parseInt(params[62]);
         this.numTlOpPast12m = ("".equals(params[63])) ? 0 : Integer.parseInt(params[63]);
         this.moSinRcntTl = ("".equals(params[64])) ? 0 : Integer.parseInt(params[64]);
@@ -220,17 +220,17 @@ public class Loan implements Comparable<Loan>{
         this.pctTlNvrDlq = ("".equals(params[71])) ? 0 : Integer.parseInt(params[71]);
         this.numTl90gDpd24m = ("".equals(params[72])) ? 0 : Integer.parseInt(params[72]);
         this.numTl30dpd = ("".equals(params[73])) ? 0 : Integer.parseInt(params[73]);
-        this.numTl120dpd2m = ("".equals(params[74])) ? 0 : Integer.parseInt(params[74]);
+        this.numTl120dpd2m = (params[74].trim().length() == 0) ? 0 : Integer.parseInt(params[74]);
         this.numIlTl = ("".equals(params[75])) ? 0 : Integer.parseInt(params[75]);
-        this.moSinOldIlAcct = ("".equals(params[76])) ? 0 : Integer.parseInt(params[76]);
+        this.moSinOldIlAcct = (params[76].trim().length() == 0) ? 0 : Integer.parseInt(params[76]);
         this.numActvRevTl = ("".equals(params[77])) ? 0 : Integer.parseInt(params[77]);
         this.moSinOldRevTlOp = ("".equals(params[78])) ? 0 : Integer.parseInt(params[78]);
         this.moSinRcntRevTlOp = ("".equals(params[79])) ? 0 : Integer.parseInt(params[79]);
         this.totalRevHiLim = ("".equals(params[80])) ? 0 : Integer.parseInt(params[80]);
         this.numRevTlBalGt0 = ("".equals(params[81])) ? 0 : Integer.parseInt(params[81]);
         this.numOpRevTl = ("".equals(params[82])) ? 0 : Integer.parseInt(params[82]);
-        this.totCollAmt = ("".equals(params[83])) ? 0 : Integer.parseInt(params[83]);          
-          this.percentBcGt75 = ("".equals(params[84])) ? 0 : Double.parseDouble(params[84]);
+        this.totCollAmt = ("".equals(params[83])) ? 0 : Integer.parseInt(params[83]);
+        this.percentBcGt75 = (params[84].trim().length() == 0) ? 0 : Double.parseDouble(params[84]);
         }
 	/**
 	 * Constructs a Loan object from a JSONObject obj with all the fields

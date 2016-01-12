@@ -141,7 +141,7 @@ public class Cirrix2a {
 				log.info("No scoring or sorting. We have developed the following prioritized list of "+ll.getLoanCount()+" desirable loans.");
 				if (ll.getLoanCount()>0){
 					log.info(ll);
-					ll.setRequestAmounts(Consts.PARTIAL_FRACTION, availableCash);
+					ll.setRequestAmounts(availableCash);
 					String orderRequest = api.formatOrderRequest(ll);
                          if (orderRequest.contains("loanId")){
 //					log.info("Will now place order.  Order request: "+orderRequest);

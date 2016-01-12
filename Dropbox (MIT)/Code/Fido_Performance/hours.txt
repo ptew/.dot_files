@@ -59,5 +59,22 @@
                         - Got rid of buffered queue and using array and atomic boolean
                         - Should just put all ordering logic in a wrap of the atomic boolean
                           
-01/10/16 - 1 hours - Jonathan Meeting
+01/10/16 - 4 hours - Jonathan Meeting
+                   - Fixed test input CSV so it could be used with fast Loan Constructor
+                   - Tested input CSV to see filter performance
+                        - Filtering takes very little runtime. Only roughly 0.8% of runtime for Filtering to get 14 from 1328 loans
+                        - Likely can not be sped up more and not an area of focus
+                   - Sped up CSV parser more
+                        - Likely all that can be speed up
+                        - Original Java Parser - 126 ms
+                        - First Version Custom Parser - 73.1 ms
+                        - This version - 23.7 ms
+                        - 81% speedup
+                   - Where did loan input come from?
+                   - Looks like a lot of request overhead with the current library in use
+                   - ToDo
+                        - Improve SetRequestOrder, FormatOrderRequest, and Order
+                        - Try to improve request sending and receiving with different library or custom implementation
+                        - Cleanup MR code
+
                      

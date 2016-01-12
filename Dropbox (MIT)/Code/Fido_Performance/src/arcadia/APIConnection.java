@@ -23,6 +23,8 @@ import net.minidev.json.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import static org.apache.commons.lang3.StringUtils.INDEX_NOT_FOUND;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.apache.http.Header;
 
 
@@ -154,15 +156,89 @@ public class APIConnection {
         return Double.toString(time) + "," + loanListAsString.length() + "\n";
     }
     
-    public LoanList fastRetrieveLoanList(String contentType) {
-        String[] loanData = getLoanListAsString(contentType, true).replaceAll("\n", ",").replace("\"","").split(",");
-        LoanList loanList = null;
-        final int LOAN_DATA_LENGTH = 104; 
-        for (int x=0; x<100; ++x) {
-            loanList = new LoanList(new LinkedList<Loan>());
-            for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
-                loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
+    public static String remove(final String str, final char remove) {
+        if (str.indexOf(remove) == INDEX_NOT_FOUND) {
+            return str;
+        }
+
+        final char[] chars = str.toCharArray();
+        int pos = 0;
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] != remove) {
+                chars[pos++] = chars[i];
             }
+        }
+        return new String(chars, 0, pos);
+    }
+    
+    public static String replaceNewlines(String str) {
+        if (str.indexOf('\n') == INDEX_NOT_FOUND) {
+            return str;
+        }
+
+        char[] chars = str.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == '\n') {
+                chars[i] = ',';
+            }
+        }
+        return new String(chars, 0, chars.length);
+    }
+    
+    public String[] parseLoanCSVString(String loans) {
+        return loans.replaceAll("\"","").replaceAll("\r|\n", ",").split(",");
+    }
+    
+    public String[] parseLoanCSVStringCustom(String loans) {
+        return remove(replaceNewlines(loans), '"').split(",");
+    }
+    
+    public void parseOld(String listAsString, String contentType) {
+        LoanList loanList = new LoanList(new LinkedList<Loan>());
+        if (!listAsString.equals("")) {
+            switch (contentType) {
+                case "text/plain":
+                    try {
+
+                        CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
+                        StringReader listAsReader = new StringReader(listAsString);
+                        CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
+                        List csvRecords = csvStringParser.getRecords();
+                        for (int i=1;i< csvRecords.size(); i++) {
+                            loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Couldn't parse CSV LoanList." + e);
+                    }
+                    break;
+                case "application/json":
+                    try {
+                        JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
+//                            String asOfDate = (String) obj.get("asOfDate");
+                        JSONArray loans = (JSONArray) obj.get("loans");
+                        if (loans!=null){
+                            for (int i =0; i < loans.size(); i++) {
+                                loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
+                            }
+                        }
+                    } catch (ClassCastException e) {
+                        System.out.println("Couldn't parse JSON LoanList." + e);
+                    }
+                    break;
+                case "application/xml":
+                    break;
+            }
+        }
+    }
+    
+    public LoanList fastRetrieveLoanList(String contentType) {
+        String loans = getLoanListAsString(contentType, true);
+       
+        String[] loanData = parseLoanCSVStringCustom(loans);
+        LoanList loanList = new LoanList(new LinkedList<Loan>());;
+        final int LOAN_DATA_LENGTH = 104;       
+        for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
+            loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
         }
  
         return loanList;
@@ -175,66 +251,62 @@ public class APIConnection {
     }
     
     public LoanList fastRetrieveLoanListFromCSV(String contentType, String filepath) {
-        try {
-            String[] loanData = readFile(filepath, StandardCharsets.UTF_8).replaceAll("\n", ",").replace("\"","").split(",");
-            LoanList loanList = null;
-            final int LOAN_DATA_LENGTH = 104; 
-            for (int x=0; x<100; ++x) {
-                loanList = new LoanList(new LinkedList<Loan>());
-                for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
-                    loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
-                }
-            }
+        
+        String[] loanData;
+        LoanList loanList = new LoanList(new LinkedList<Loan>());
 
-            return loanList;
-        } catch (Exception e) {
-            return null;
+        try {
+            loanData = readFile(filepath, StandardCharsets.UTF_8).replaceAll("\"","").replaceAll("\r|\n", ",").split(",");
+//            System.out.println(readFile(filepath, StandardCharsets.UTF_8).split("\r\n")[0]);
+            final int LOAN_DATA_LENGTH = 104; 
+            for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
+                loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
+            }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(APIConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return loanList;
     }
 
     public LoanList retrieveLoanList(String contentType, boolean showAll){
         String listAsString = getLoanListAsString(contentType, showAll);
-        LoanList loanList = null;
-        long start = System.currentTimeMillis();
-        for (int x=0; x<100; ++x) {
-            loanList = new LoanList(new LinkedList<Loan>());
-            if (!listAsString.equals("")) {
-                switch (contentType) {
-                    case "text/plain":
-                        try {
+        LoanList loanList = new LoanList(new LinkedList<Loan>());
+        if (!listAsString.equals("")) {
+            switch (contentType) {
+                case "text/plain":
+                    try {
 
-                            CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
-                            StringReader listAsReader = new StringReader(listAsString);
-                            CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
-                            List csvRecords = csvStringParser.getRecords();
-                            for (int i=1;i< csvRecords.size(); i++) {
-                                loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Couldn't parse CSV LoanList." + e);
+                        CSVFormat csvStringFormat = CSVFormat.DEFAULT.withHeader().withQuote('"');
+                        StringReader listAsReader = new StringReader(listAsString);
+                        CSVParser csvStringParser = new CSVParser(listAsReader, csvStringFormat);
+                        List csvRecords = csvStringParser.getRecords();
+                        for (int i=1;i< csvRecords.size(); i++) {
+                            loanList.addLoan(new Loan(contentType,(Object) csvRecords.get(i)));
                         }
-                        break;
-                    case "application/json":
-                        try {
-                            JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
-    //                            String asOfDate = (String) obj.get("asOfDate");
-                            JSONArray loans = (JSONArray) obj.get("loans");
-                            if (loans!=null){
-                                for (int i =0; i < loans.size(); i++) {
-                                    loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
-                                }
+                    } catch (Exception e) {
+                        System.out.println("Couldn't parse CSV LoanList." + e);
+                    }
+                    break;
+                case "application/json":
+                    try {
+                        JSONObject obj = (JSONObject) JSONValue.parse(listAsString);
+//                            String asOfDate = (String) obj.get("asOfDate");
+                        JSONArray loans = (JSONArray) obj.get("loans");
+                        if (loans!=null){
+                            for (int i =0; i < loans.size(); i++) {
+                                loanList.addLoan(new Loan(contentType,(Object) loans.get(i)));
                             }
-                        } catch (ClassCastException e) {
-                            System.out.println("Couldn't parse JSON LoanList." + e);
                         }
-                        break;
-                    case "application/xml":
-                        break;
-                }
+                    } catch (ClassCastException e) {
+                        System.out.println("Couldn't parse JSON LoanList." + e);
+                    }
+                    break;
+                case "application/xml":
+                    break;
             }
         }
-        long end = System.currentTimeMillis();
-//        System.out.println("Avg time for slow: " + (end - start)/100000.0);
+        
         return loanList;
     }
 
@@ -266,19 +338,20 @@ public class APIConnection {
      */
     public String formatOrderRequest(LoanList orderList){
         String preamble = "{\"aid\":"+this.aid+",\"orders\":[";
-        String loanOrders="";
-        for (Loan l : orderList.getLoans()){
+        StringBuilder loanOrders= new StringBuilder();
+        for (Loan l : orderList.getLoans()) {
             if (l.getReqAmount() > 0.0){
-                loanOrders+="{\"loanId\":"+l.getLoanID()+",\"requestedAmount\":"+l.getReqAmount()+"},";
+                loanOrders.append("{\"loanId\":"+l.getLoanID()+",\"requestedAmount\":"+l.getReqAmount()+"},");
             }
         }
         
+        String order = loanOrders.toString();
         //delete the extra comma
-        if (!loanOrders.equals("")){
-            loanOrders = loanOrders.substring(0, loanOrders.length()-1);
+        if (!order.equals("")){
+            order = order.substring(0, order.length()-1);
         }
         String postamble = "]}";
-        return preamble+loanOrders+postamble;
+        return preamble+order+postamble;
     }
 
     public String benchmarkPlaceOrder(String orderRequest, String  contentType) {
@@ -287,21 +360,29 @@ public class APIConnection {
         String orderConfirmationAsString = "";
         return orderConfirmationAsString;
     }
+    
+    public String placeOrder(String orderRequest){
+        HttpPost placeOrder = new HttpPost(orderURI);
+        placeOrder.setHeader("Accept", Consts.CSV);
+        placeOrder.setHeader("Authorization",authToken);
+        placeOrder.setHeader("Connection", "keep-alive");     
+        StringEntity payload = new StringEntity(orderRequest, ContentType.TEXT_PLAIN);
+        placeOrder.setEntity(payload);
+
+        ResponseHandler<String> rh = new BasicResponseHandler();
+        String orderConfirmationAsString = "";
+//        try {
+//            orderConfirmationAsString = client.execute(placeOrder,rh);
+//        } catch (ClientProtocolException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return orderConfirmationAsString;
+    }
 
     public String placeOrder(String orderRequest, String  contentType){
-        URI uri = null;
-        try {
-                uri = new URIBuilder()
-                .setScheme(scheme)
-                .setHost(host)
-                .setPath(orderPath)
-                .build();
-        } catch (URISyntaxException e1) {
-                e1.printStackTrace();
-        }
-        
-//		System.out.println(uri);
-        HttpPost placeOrder = new HttpPost(uri);
+        HttpPost placeOrder = new HttpPost(orderURI);
         placeOrder.setHeader("Accept", contentType);
         placeOrder.setHeader("Authorization",authToken);
         placeOrder.setHeader("Connection", "keep-alive");
