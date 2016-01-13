@@ -1,12 +1,7 @@
 package arcadia;
 
-import static arcadia.Cirrix.contentType;
-import static arcadia.Cirrix.log;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
@@ -43,7 +38,7 @@ public class LoanOrderer implements Runnable{
                 try {
                     LoanList currentOrder = retrievalQueue.take();
                     currentOrder.removeLoanList(alreadyOrdered);
-                    log.info("New Loans recieved by Orderer: " + currentOrder.getLoanCount());
+                    log.info("New Loans received by Orderer: " + currentOrder.getLoanCount());
                     if (currentOrder.getLoanCount()>0) {            
                         currentOrder.filter(filter);
                         log.info("Filtered. "+currentOrder.getLoanCount()+" loans left");

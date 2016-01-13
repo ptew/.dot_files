@@ -160,6 +160,19 @@ public class APIConnection {
         return new String(chars, 0, pos);
     }
     
+    public static String replaceTextualCommas(String str) {
+        boolean startText = false;
+        char[] chars = str.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == '"' ) {
+                startText = !startText;
+            } else if (chars[i] == ',' && startText) {
+                chars[i] = '/';
+            }
+        }
+        return new String(chars, 0, chars.length);
+    }
+    
     public static String replaceNewlines(String str) {
         if (str.indexOf('\n') == INDEX_NOT_FOUND) {
             return str;
@@ -175,14 +188,13 @@ public class APIConnection {
     }
     
     public String[] parseLoanCSVStringCustom(String loans) {
-        return remove(replaceNewlines(loans), '"').split(",");
+        return remove(replaceNewlines(replaceTextualCommas(loans)), '"').split(",");
     }
     
     private LoanList retrieveLoanList(boolean showAll) {
         String loans = getLoanListAsString(showAll);
-       
         String[] loanData = parseLoanCSVStringCustom(loans);
-        LoanList loanList = new LoanList(new LinkedList<Loan>());;
+        LoanList loanList = new LoanList(new LinkedList<Loan>());
         final int LOAN_DATA_LENGTH = 104;       
         for (int i=LOAN_DATA_LENGTH; i < loanData.length - LOAN_DATA_LENGTH; i+=LOAN_DATA_LENGTH) {
             loanList.addLoan(new Loan(Arrays.copyOfRange(loanData, i, i + LOAN_DATA_LENGTH)));
@@ -317,6 +329,7 @@ public class APIConnection {
 
         ResponseHandler<String> rh = new BasicResponseHandler();
         String orderConfirmationAsString = "";
+        log.info("Order would be placed now.");
 //        try {
 //            orderConfirmationAsString = client.execute(placeOrder,rh);
 //        } catch (ClientProtocolException e) {

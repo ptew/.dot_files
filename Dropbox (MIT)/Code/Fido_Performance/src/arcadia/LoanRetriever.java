@@ -21,7 +21,7 @@ public class LoanRetriever implements Runnable{
         this.queue = queue;
         this.api = api;
         this.log = log;
-        this.watchIterations = watchIterations;
+        this.watchIterations = 300;
         this.threadID = threadID;
         this.atomicFlag = atomicFlag;
         this.atomicLoanCount = atomicLoanCount;
@@ -34,24 +34,21 @@ public class LoanRetriever implements Runnable{
         
         for (int t=0; t < watchIterations; t++){
             try {
-                Thread.sleep(5000);
+                Thread.sleep(200);
             } catch (InterruptedException ex) {
                 java.util.logging.Logger.getLogger(LoanRetriever.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (api.isWatching()) {
                 log.info("t= " + t + " for Thread " + threadID);
-                Calendar calendar = Calendar.getInstance();
-                LoanList ll = new LoanList(new LinkedList<Loan>());
-                
-                if (calendar.get(Calendar.SECOND) > 55) {
-                    ll = api.retrieveNewLoanList();
-                }
+                LoanList ll = api.retrieveNewLoanList();
                 
                 int atomicLoanCountValue = atomicLoanCount.get();
                 if ((ll.getLoanCount() > 0 && atomicFlag.compareAndSet(false, true) && atomicLoanCount.compareAndSet(0, ll.getLoanCount()))
                         || (ll.getLoanCount() > atomicLoanCountValue && atomicLoanCount.compareAndSet(atomicLoanCountValue, ll.getLoanCount()))) {
                     log.info("New Loans Published: " + ll.getLoanCount() + " from Thread " + threadID);
                     queue.offer(ll);
+                } else {
+                    log.info("No new loans for Thread " + threadID);
                 }
             } else {
                 log.info("Retriever loop broken, API no longer watching?");

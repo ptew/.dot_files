@@ -59,7 +59,7 @@
                         - Got rid of buffered queue and using array and atomic boolean
                         - Should just put all ordering logic in a wrap of the atomic boolean
                           
-01/10/16 - 7 hours - Jonathan Meeting
+01/10/16 - 8 hours - Jonathan Meeting
                    - Fixed test input CSV so it could be used with fast Loan Constructor
                    - Tested input CSV to see filter performance
                         - Filtering takes very little runtime. Only roughly 0.8% of runtime for Filtering to get 14 from 1328 loans
@@ -83,11 +83,10 @@
                         - Added Cirrix Class as base class for all Cirix subclasses
                         - Refactored all Cirrix Versions for similar printing and indentation
                         - Removed all dead code
-                   - ToDo 
-                        - Cleanup MR code
-                            - Should have atomic high and low id's
-                            - should have one threadsafe drain for ordered loans
-                        - Look to see if there is a lower latency request library
-                            - It looks like Apache library is the best
+                    - Cleanup MR code
+                        - Should be ready for live testing
+                    - Look to see if there is a lower latency request library
+                        - It looks like Apache library is the best
+                    - Emailed Jonathan regarding live testing
 
                      

@@ -1,11 +1,15 @@
 package arcadia;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 public class LoanLogger extends Cirrix {
 
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException, IOException{
         //grab ordering parameters from configuration file, if it exists
         String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
         // String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
@@ -24,32 +28,27 @@ public class LoanLogger extends Cirrix {
         log = Logger.getLogger(LoanLogger.class.getName());
         APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
         String filepath = "/Users/ParkerTew/Dropbox (MIT)/Code/logs/realisticLoans/cirrix1-real.csv";
-        LoanList fast = api.retrieveNewLoanList();
-//        LoanList slow = api.retrieveLoanList(contentType, true);
-//        slow.removeLoanList(fast);
-//        assert(slow.getLoanCount()==0);
-//        System.out.println(api.getLoanListAsString(contentType, true));
-//        File file;
-//        FileWriter fw;
-//        BufferedWriter bw;
-//        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/show-all-false.csv");
-//        try {
-//            // if file doesnt exists, then create it
-//            if (!file.exists()) {
-//                    file.createNewFile();
-//            }
-//
-//            fw = new FileWriter(file.getAbsoluteFile());
-//            bw = new BufferedWriter(fw);
+        File file;
+        FileWriter fw;
+        BufferedWriter bw;
+        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/realisticLoans/real-cirrix1.csv");
+        try {
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                    file.createNewFile();
+            }
+
+            fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
 //            bw.write("Total Time,Response Length\n");
-//            
-//            bw.write(api.getLoanListAsString(Consts.CSV, true));
-//            
-//            bw.close();
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
+            
+            bw.write(api.getLoanListAsString(true));
+            
+            bw.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         
 //        file = new File("/Users/ParkerTew/Dropbox (MIT)/Code/logs/json-timing.csv");
 //        try {

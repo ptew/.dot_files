@@ -110,8 +110,8 @@ public class Cirrix1MR extends Cirrix {
         log.info("Remaining Avalible Cash: " + availableCash);
         
         //set up multithreading system
-        List<OrderConfirmation> confirmations = new ArrayList<OrderConfirmation>();
-        BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<LoanList>();
+        List<OrderConfirmation> confirmations = new ArrayList<>();
+        BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<>();
         AtomicBoolean atomicFlag = new AtomicBoolean(false);
         AtomicInteger atomicLoanCount = new AtomicInteger(0);
 

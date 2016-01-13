@@ -231,7 +231,7 @@ public class Loan implements Comparable<Loan>{
         this.numOpRevTl = ("".equals(params[82])) ? 0 : Integer.parseInt(params[82]);
         this.totCollAmt = ("".equals(params[83])) ? 0 : Integer.parseInt(params[83]);
         this.percentBcGt75 = (params[84].trim().length() == 0) ? 0 : Double.parseDouble(params[84]);
-        }
+    }
 	/**
 	 * Constructs a Loan object from a JSONObject obj with all the fields
 	 * @param obj
