@@ -33,11 +33,6 @@ public class LoanRetriever implements Runnable{
         log.info("Started Retreiver Thread: " + threadID);
         
         for (int t=0; t < watchIterations; t++){
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                java.util.logging.Logger.getLogger(LoanRetriever.class.getName()).log(Level.SEVERE, null, ex);
-            }
             if (api.isWatching()) {
                 log.info("t= " + t + " for Thread " + threadID);
                 LoanList ll = api.retrieveNewLoanList();
@@ -53,6 +48,11 @@ public class LoanRetriever implements Runnable{
             } else {
                 log.info("Retriever loop broken, API no longer watching?");
                 break;
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                java.util.logging.Logger.getLogger(LoanRetriever.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         

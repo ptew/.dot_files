@@ -59,7 +59,7 @@
                         - Got rid of buffered queue and using array and atomic boolean
                         - Should just put all ordering logic in a wrap of the atomic boolean
                           
-01/10/16 - 8 hours - Jonathan Meeting
+01/12/16 - 8 hours - Jonathan Meeting
                    - Fixed test input CSV so it could be used with fast Loan Constructor
                    - Tested input CSV to see filter performance
                         - Filtering takes very little runtime. Only roughly 0.8% of runtime for Filtering to get 14 from 1328 loans
@@ -89,4 +89,10 @@
                         - It looks like Apache library is the best
                     - Emailed Jonathan regarding live testing
 
-                     
+01/13/16 - 3 hours - Took Cirrix1MR live
+                        - Fixed bug parsing loans when there was a comma in a text section
+                   - Cirri1MR looked pretty good to me!
+                   - Might want to up the number of threads and reduce the delay between them and reduce their sleep time.
+                   - Made schematics and sent to Jonathan
+
+Total 30 hours
