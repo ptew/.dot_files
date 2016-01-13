@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.lang3.StringUtils;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 
 public class Cirrix1MR extends Cirrix {
 	
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException {
         //grab ordering parameters from configuration file, if it exists
         String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
 //        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
@@ -74,104 +74,89 @@ public class Cirrix1MR extends Cirrix {
         log.info("Credit models: " + params.creditModel);
         log.info("Excluded 36M subgrades: " + params.INVALID_SUBGRADES_36);
         log.info("Excluded 60M subgrades: " + params.INVALID_SUBGRADES_60);
-  //          log.info("Excluded grades: " + Consts.C1_INVALID_GRADES);
         log.info("Invalid purposes: " + Consts.C1_INVALID_PURPOSES);
         log.info("Loans retrieved using contentType: " + contentType);	
-        LoanList initialPool = api.retrieveLoanList(contentType, true);
-        log.info("Before new loans load, initial pool size = "+initialPool.getLoanCount());
-        LoanList completePool = new LoanList(new LinkedList<Loan>());
-        int investedNotes=0;
+        
+        LoanList alreadyOrdered = new LoanList(new LinkedList<Loan>());
+        LoanList initialPool = api.retrieveAllLoanList();
 
-        if (watchForNew == true) {	
-            //set up multithreading system
-            LoanList alreadyOrdered = new LoanList(new LinkedList<Loan>());
-            List<OrderConfirmation> confirmations = new ArrayList<OrderConfirmation>();
-            BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<LoanList>();
-            BlockingQueue<LoanList> recycleQueue = new LinkedBlockingQueue<LoanList>();
-            AtomicBoolean atomicFlag = new AtomicBoolean(false);
-            AtomicInteger atomicLowID = new AtomicInteger(-1);
-            AtomicInteger atomicHighID = new AtomicInteger(-1);
-            LoanRetriever retriever = new LoanRetriever(api, initialPool.getLoanCount(), retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, atomicFlag);
-            LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, recycleQueue, filt, scorer, alreadyOrdered, confirmations, availableCash, Consts.PARTIAL_FRACTION, Consts.C1_PREORDER_THRESHHOLD, log, contentType);
-            Thread retrieverThreadOne = new Thread(retriever);
-            Thread retrieverThreadTwo = new Thread(retriever);
-            Thread retrieverThreadThree = new Thread(retriever);
-            Thread retrieverThreadFour = new Thread(retriever);
-            Thread retrieverThreadFive = new Thread(retriever);
-            Thread ordererThread = new Thread(orderer);
-
-            //start threads
-            ordererThread.start();
-            retrieverThreadOne.start();
-            Thread.sleep(100);
-            retrieverThreadTwo.start();
-            Thread.sleep(100);
-            retrieverThreadThree.start();
-            Thread.sleep(100);
-            retrieverThreadFour.start();
-            Thread.sleep(100);
-            retrieverThreadFive.start();
-
-            //wait for threads to close
-            try {
-                retrieverThreadOne.join();
-                retrieverThreadTwo.join();
-                retrieverThreadThree.join();
-                retrieverThreadFour.join();
-                retrieverThreadFive.join();
-                ordererThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            log.info("Back to main thread!");
-            log.info("Checking results from the watching threads...");
-            double cashSpent = 0;
-            for (OrderConfirmation oc : confirmations){
-                if (oc.getInvestedAmount()>0){
-                    availableCash-=oc.getInvestedAmount();
-                    cashSpent+=oc.getInvestedAmount();
-                    investedNotes++;
+        int investedNotes = 0;
+        log.info("Retreived " + initialPool.getLoanCount() + " old loans");
+        if (initialPool.getLoanCount()>0) {            
+            initialPool.filter(filt);
+            log.info("Filtered. "+initialPool.getLoanCount()+" loans left");
+            log.info("No scoring or sorting. We have developed the following prioritized list of "+ initialPool.getLoanCount()+" desirable loans.");
+            if (initialPool.getLoanCount()>0) {
+                initialPool.setFractionalRequestAmounts(availableCash, Consts.PARTIAL_FRACTION);
+                String orderRequest = api.formatOrderRequest(initialPool);
+                log.info("Selected "+initialPool.getLoanCount()+" loans for pre-order");
+                if (orderRequest.contains("loanId")){
+                    log.info("Loans selected for order: " + initialPool);
+                    log.info("Order Request: " + orderRequest);
+                    String confirmationString = api.placeOrderCSV(orderRequest);
+                    List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmationString, contentType);
+                    for (OrderConfirmation oc : ocList){
+                        log.info("Order Confirmation: " + oc.toString());
+                        if (oc.getInvestedAmount()>0) {
+                            availableCash-=oc.getInvestedAmount();
+                            investedNotes++;
+                            alreadyOrdered.addLoan(initialPool.getLoanFromID(oc.getLoanID()));
+                        }
+                    }                  
                 }
             }
-            log.info("Total pre-order summary: $"+cashSpent+" on "+investedNotes+" notes.");
-            log.info("$"+availableCash+" remaining...");
+        }
+        log.info("Completed Ordering " + alreadyOrdered.getLoanCount() + " old loans");
+        log.info("Remaining Avalible Cash: " + availableCash);
+        
+        //set up multithreading system
+        List<OrderConfirmation> confirmations = new ArrayList<OrderConfirmation>();
+        BlockingQueue<LoanList> retrievalQueue = new LinkedBlockingQueue<LoanList>();
+        AtomicBoolean atomicFlag = new AtomicBoolean(false);
+        AtomicInteger atomicLoanCount = new AtomicInteger(0);
 
-            //grab all loans on the recycle queue
-            List<LoanList> allLoanLists = new ArrayList<LoanList>();
-            recycleQueue.drainTo(allLoanLists);
-            for (LoanList ll : allLoanLists){
-                completePool.merge(ll);
+        LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, filt, scorer, alreadyOrdered, confirmations, availableCash, Consts.PARTIAL_FRACTION, log, contentType);
+        Thread retrieverThreadOne = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 1, atomicFlag, atomicLoanCount));
+        Thread retrieverThreadTwo = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 2, atomicFlag, atomicLoanCount));
+        Thread retrieverThreadThree = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 3, atomicFlag, atomicLoanCount));
+        Thread retrieverThreadFour = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 4, atomicFlag, atomicLoanCount));
+        Thread retrieverThreadFive = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 5, atomicFlag, atomicLoanCount));
+        Thread ordererThread = new Thread(orderer);
+
+        //start threads
+        ordererThread.start();
+        retrieverThreadOne.start();
+        Thread.sleep(100);
+        retrieverThreadTwo.start();
+        Thread.sleep(100);
+        retrieverThreadThree.start();
+        Thread.sleep(100);
+        retrieverThreadFour.start();
+        Thread.sleep(100);
+        retrieverThreadFive.start();
+
+        //wait for threads to close
+        try {
+            retrieverThreadOne.join();
+            retrieverThreadTwo.join();
+            retrieverThreadThree.join();
+            retrieverThreadFour.join();
+            retrieverThreadFive.join();
+            ordererThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        log.info("Back to main thread!");
+        log.info("Checking results from the watching threads...");
+        
+        for (OrderConfirmation oc : confirmations){
+            if (oc.getInvestedAmount()>0){
+                availableCash-=oc.getInvestedAmount();
+                investedNotes++;
             }
-            completePool.removeLoanList(alreadyOrdered);
-        } else {
-            completePool = initialPool;
         }
-
-        //order the loans
-        log.info("Compiled complete listing; "+completePool.getLoanCount()+" loans retrieved");
-        completePool.filter(filt);
-        log.info("Filtered. "+completePool.getLoanCount()+" loans left");
-        completePool.scoreAllLoans(scorer, Consts.C1_MIN_SCORE_CUTOFF);
-        log.info("Scored. "+completePool.getLoanCount()+" loans left");
-        completePool.sortLoans();
-        log.info("Sorted. After sorting, we have developed the following prioritized list of "+completePool.getLoanCount()+" desirable loans.");
-        if (completePool.getLoanCount()>0){
-            log.info(completePool);
-            completePool.setFractionalRequestAmounts(availableCash,Consts.PARTIAL_FRACTION,);
-            String orderRequest = api.formatOrderRequest(completePool);
-            log.info("Order request: "+orderRequest);
-            log.info("Will now call api.placeOrder(). Number of requested loans = " + StringUtils.countMatches(orderRequest, "loanId"));
-            String confirmation = api.placeOrder(orderRequest, contentType);
-            List<OrderConfirmation> ocList = api.parseOrderConfirmation(confirmation, contentType);
-            for (OrderConfirmation oc : ocList){
-                log.info(oc.toString());
-                  if (oc.getInvestedAmount()>0){
-                          availableCash-=oc.getInvestedAmount();
-                          investedNotes++;
-                  }
-            }   
-        }
+        
         log.info("Run completed. $"+(purchaseTarget-availableCash)+" spent in "+investedNotes+" notes.");
     }
 }

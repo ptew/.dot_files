@@ -59,7 +59,7 @@
                         - Got rid of buffered queue and using array and atomic boolean
                         - Should just put all ordering logic in a wrap of the atomic boolean
                           
-01/10/16 - 6 hours - Jonathan Meeting
+01/10/16 - 7 hours - Jonathan Meeting
                    - Fixed test input CSV so it could be used with fast Loan Constructor
                    - Tested input CSV to see filter performance
                         - Filtering takes very little runtime. Only roughly 0.8% of runtime for Filtering to get 14 from 1328 loans

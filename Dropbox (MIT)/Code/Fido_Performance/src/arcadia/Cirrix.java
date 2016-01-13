@@ -5,8 +5,6 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-
 import org.apache.log4j.Logger;
 
 public class Cirrix {
@@ -33,5 +31,5 @@ public class Cirrix {
     public static String getIP() throws UnknownHostException{
         InetAddress ipAddress = InetAddress.getByName("api.lendingclub.com"); // WARNING:  this will return the IP address in the system HOSTS file, if it exists.
         return ipAddress.getHostAddress();
-      }	
+    }	
 }
