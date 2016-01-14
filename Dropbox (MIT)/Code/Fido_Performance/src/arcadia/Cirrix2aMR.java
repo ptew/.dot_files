@@ -2,6 +2,7 @@ package arcadia;
 
 import static arcadia.Cirrix.IP_Host;
 import static arcadia.Cirrix.getIP;
+import static arcadia.Cirrix.getTimeBlock;
 import static arcadia.Cirrix.log;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -14,22 +15,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 
-public class Cirrix1MR extends Cirrix {
+public class Cirrix2aMR extends Cirrix {
 	
     public static void main(String[] args) throws InterruptedException {
         //grab ordering parameters from configuration file, if it exists
-        String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
-//        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
-        String account = "C1_";
+        String configFile = "/home/master/fidoconfig/Cirrix 2a Order Entry Controls.xlsx";
+        String account = "C2a_";
         Config params = new Config (configFile, account);
         params.readFile();
 
         /////////////////////////////////////////////////////////////////////
-        /////////             CONTROL PARAMETERS	        	/////////
+        /////////               CONTROL PARAMETERS                  /////////
         /////////////////////////////////////////////////////////////////////
         double purchaseTarget = params.orderMax;
         double availableCash = purchaseTarget;
-        boolean watchForNew = true;
+        boolean watchForNew;
         if (params.watch.equals("YES")){ //"Do you want this ordering session to wait for the new listings?"
             watchForNew = true;
         }else if (params.watch.equals("NO")){
@@ -46,13 +46,13 @@ public class Cirrix1MR extends Cirrix {
         }
 
         /////////////////////////////////////////////////////////////////////
-        /////////		       SETUP				/////////
+        ////////			     SETUP			    /////////
         /////////////////////////////////////////////////////////////////////
         System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-        String pathToLogs = Consts.PATH_TO_LOGS+Cirrix1MR.class.getName()+"/";
+        String pathToLogs = Consts.PATH_TO_LOGS+Cirrix2.class.getName()+"/";
         Calendar cal = Calendar.getInstance();
         System.setProperty("logfile.name", pathToLogs+cal.get(Calendar.YEAR)+"/"+Consts.MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.DATE)+"-"+getTimeBlock(cal)+".txt");
-        log = Logger.getLogger(Cirrix1MR.class.getName());
+        log = Logger.getLogger(Cirrix2.class.getName());
         
         try {
             IP_Host = getIP();
@@ -60,10 +60,10 @@ public class Cirrix1MR extends Cirrix {
         } catch (UnknownHostException e) {
             log.info("Error (UnknownHostException): " + e);
         }
-        
-        APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
-        Filter filt = new Filter(Consts.C1_MIN_INCOME, Consts.C1_DTI_INQ_FICO, Consts.C1_FICO_INQUIRIES_CHECK, Consts.C1_STATE_LOAN_AMOUNT_CHECK, Consts.C1_FICO_LOAN_CHECK, params.TERM_SUBGRADE_CHECK, Consts.C1_INVALID_GRADES, Consts.C1_INVALID_PURPOSES, Consts.C1_EMP_LENGTH_MIN, Consts.C1_DTI_MAX, Consts.C1_DTI_TERM_CHECK, Consts.C1_FICO_LOW_THRESHHOLD, isWholeValid, isFractionalValid, is36Valid, is60Valid, params.creditModel);
-	Scorer scorer = new Scorer(Consts.C2_INQUIRIES_BONUSES, Consts.C2_FICO_BONUSES, Consts.C2_USAGE_BONUSES, Consts.C2_STATE_BONUSES, Consts.C2_GRADE_BONUSES, Consts.C2_TERM_BONUSES, Consts.C1_WILL_COMPETE_BONUS);
+
+        APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C2a_REAL_TOKEN, Consts.C2a_REAL_AID, log);
+        Filter filt = new Filter(Consts.C2_MIN_INCOME, Consts.C2_DTI_INQ_FICO, Consts.C2_FICO_INQUIRIES_CHECK, Consts.C2_STATE_LOAN_AMOUNT_CHECK, Consts.C2_FICO_LOAN_CHECK, params.TERM_SUBGRADE_CHECK, Consts.C2_INVALID_GRADES, Consts.C2_INVALID_PURPOSES, Consts.C2_EMP_LENGTH_MIN, Consts.C2_DTI_MAX, Consts.C2_DTI_TERM_CHECK, Consts.C2_FICO_LOW_THRESHHOLD, isWholeValid, isFractionalValid, is36Valid, is60Valid, params.creditModel);
+	Scorer scorer = new Scorer(Consts.C2_INQUIRIES_BONUSES, Consts.C2_FICO_BONUSES, Consts.C2_USAGE_BONUSES, Consts.C2_STATE_BONUSES, Consts.C2_GRADE_BONUSES, Consts.C2_TERM_BONUSES, Consts.C2_WILL_COMPETE_BONUS);
 
         /////////////////////////////////////////////////////////////////////
         /////////		  RETRIEVAL			    /////////
@@ -87,7 +87,7 @@ public class Cirrix1MR extends Cirrix {
             log.info("Filtered. "+initialPool.getLoanCount()+" loans left");
             log.info("No scoring or sorting. We have developed the following prioritized list of "+ initialPool.getLoanCount()+" desirable loans.");
             if (initialPool.getLoanCount()>0) {
-                initialPool.setFractionalRequestAmounts(availableCash, Consts.PARTIAL_FRACTION);
+                initialPool.setRequestAmounts(availableCash);
                 String orderRequest = api.formatOrderRequest(initialPool);
                 log.info("Selected "+initialPool.getLoanCount()+" loans for pre-order");
                 if (orderRequest.contains("loanId")){
@@ -115,7 +115,7 @@ public class Cirrix1MR extends Cirrix {
         AtomicBoolean atomicFlag = new AtomicBoolean(false);
         AtomicInteger atomicLoanCount = new AtomicInteger(0);
 
-        LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, filt, scorer, alreadyOrdered, confirmations, log, contentType, availableCash, Consts.PARTIAL_FRACTION);
+        LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, filt, scorer, alreadyOrdered, confirmations, log, contentType, availableCash);
         Thread retrieverThreadOne = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 1, atomicFlag, atomicLoanCount));
         Thread retrieverThreadTwo = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 2, atomicFlag, atomicLoanCount));
         Thread retrieverThreadThree = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 3, atomicFlag, atomicLoanCount));

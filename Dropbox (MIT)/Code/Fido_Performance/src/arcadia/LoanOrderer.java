@@ -8,17 +8,18 @@ import org.apache.log4j.Logger;
 
 public class LoanOrderer implements Runnable{
 	private BlockingQueue<LoanList> retrievalQueue;
-	private APIConnection api;
-	private Logger log;
+	private final APIConnection api;
+	private final Logger log;
 	private LoanList alreadyOrdered;
-	private Filter filter;
-	private Scorer scorer;
-	private double  availableCash, fractionalMax;
-	private String contentType;
-	private List<OrderConfirmation> confirmations;
+	private final Filter filter;
+	private final Scorer scorer;
+	private double  availableCash;
+        private final double fractionalMax;
+	private final String contentType;
+	private final List<OrderConfirmation> confirmations;
+	private final double WHOLE = 1.0;
 	
-	
-	public LoanOrderer(APIConnection api, BlockingQueue<LoanList> retrievalQueue, Filter filter, Scorer scorer, LoanList alreadyOrdered, List<OrderConfirmation> confirmations, double availableCash, double fractionalMax, Logger log, String contentType){
+	public LoanOrderer(APIConnection api, BlockingQueue<LoanList> retrievalQueue, Filter filter, Scorer scorer, LoanList alreadyOrdered, List<OrderConfirmation> confirmations, Logger log, String contentType, double availableCash, double fractionalMax){
 		this.retrievalQueue = retrievalQueue;
 		this.api = api;
 		this.log = log;
@@ -27,6 +28,19 @@ public class LoanOrderer implements Runnable{
 		this.alreadyOrdered = alreadyOrdered;
 		this.availableCash = availableCash;
 		this.fractionalMax = fractionalMax;
+		this.contentType = contentType;
+		this.confirmations = confirmations;
+	}
+        
+        public LoanOrderer(APIConnection api, BlockingQueue<LoanList> retrievalQueue, Filter filter, Scorer scorer, LoanList alreadyOrdered, List<OrderConfirmation> confirmations, Logger log, String contentType, double availableCash){
+		this.retrievalQueue = retrievalQueue;
+		this.api = api;
+		this.log = log;
+		this.filter = filter;
+		this.scorer = scorer;
+		this.alreadyOrdered = alreadyOrdered;
+		this.availableCash = availableCash;
+		this.fractionalMax = WHOLE;
 		this.contentType = contentType;
 		this.confirmations = confirmations;
 	}
@@ -44,7 +58,12 @@ public class LoanOrderer implements Runnable{
                         log.info("Filtered. "+currentOrder.getLoanCount()+" loans left");
                         log.info("No scoring or sorting. We have developed the following prioritized list of "+ currentOrder.getLoanCount()+" desirable loans.");
                         if (currentOrder.getLoanCount()>0) {
-                            currentOrder.setFractionalRequestAmounts(availableCash, fractionalMax);
+                            if (fractionalMax == WHOLE) {
+                                currentOrder.setRequestAmounts(availableCash);    
+                            } else {
+                                currentOrder.setFractionalRequestAmounts(availableCash, fractionalMax);    
+                            }
+                            
                             String orderRequest = api.formatOrderRequest(currentOrder);
                             log.info("Selected "+currentOrder.getLoanCount()+" loans for pre-order");
                             if (orderRequest.contains("loanId")){

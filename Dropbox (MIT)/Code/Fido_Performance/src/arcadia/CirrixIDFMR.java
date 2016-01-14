@@ -14,22 +14,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 
-public class Cirrix1MR extends Cirrix {
+public class CirrixIDFMR extends Cirrix {
 	
     public static void main(String[] args) throws InterruptedException {
         //grab ordering parameters from configuration file, if it exists
-        String configFile = "/Users/ParkerTew/Dropbox (MIT)/Code/Fido_Performance/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
-//        String configFile = "/home/master/fidoconfig/Cirrix 1 Order Entry Controls.xlsx";
-        String account = "C1_";
+        String configFile = "/home/master/fidoconfig/Cirrix IDF 1 Order Entry Controls.xlsx";
+        String account = "CIDF_";
         Config params = new Config (configFile, account);
         params.readFile();
 
         /////////////////////////////////////////////////////////////////////
-        /////////             CONTROL PARAMETERS	        	/////////
+        /////////		 CONTROL PARAMETERS                 /////////
         /////////////////////////////////////////////////////////////////////
         double purchaseTarget = params.orderMax;
         double availableCash = purchaseTarget;
-        boolean watchForNew = true;
+        boolean watchForNew;
         if (params.watch.equals("YES")){ //"Do you want this ordering session to wait for the new listings?"
             watchForNew = true;
         }else if (params.watch.equals("NO")){
@@ -45,14 +44,15 @@ public class Cirrix1MR extends Cirrix {
             is60Valid=true;
         }
 
+
         /////////////////////////////////////////////////////////////////////
-        /////////		       SETUP				/////////
+        /////////			SETUP                       /////////
         /////////////////////////////////////////////////////////////////////
         System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-        String pathToLogs = Consts.PATH_TO_LOGS+Cirrix1MR.class.getName()+"/";
+        String pathToLogs = Consts.PATH_TO_LOGS+CirrixIDF.class.getName()+"/";
         Calendar cal = Calendar.getInstance();
         System.setProperty("logfile.name", pathToLogs+cal.get(Calendar.YEAR)+"/"+Consts.MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.DATE)+"-"+getTimeBlock(cal)+".txt");
-        log = Logger.getLogger(Cirrix1MR.class.getName());
+        log = Logger.getLogger(CirrixIDF.class.getName());
         
         try {
             IP_Host = getIP();
@@ -60,10 +60,10 @@ public class Cirrix1MR extends Cirrix {
         } catch (UnknownHostException e) {
             log.info("Error (UnknownHostException): " + e);
         }
-        
-        APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.C1_REAL_TOKEN, Consts.C1_REAL_AID, log);
-        Filter filt = new Filter(Consts.C1_MIN_INCOME, Consts.C1_DTI_INQ_FICO, Consts.C1_FICO_INQUIRIES_CHECK, Consts.C1_STATE_LOAN_AMOUNT_CHECK, Consts.C1_FICO_LOAN_CHECK, params.TERM_SUBGRADE_CHECK, Consts.C1_INVALID_GRADES, Consts.C1_INVALID_PURPOSES, Consts.C1_EMP_LENGTH_MIN, Consts.C1_DTI_MAX, Consts.C1_DTI_TERM_CHECK, Consts.C1_FICO_LOW_THRESHHOLD, isWholeValid, isFractionalValid, is36Valid, is60Valid, params.creditModel);
-	Scorer scorer = new Scorer(Consts.C2_INQUIRIES_BONUSES, Consts.C2_FICO_BONUSES, Consts.C2_USAGE_BONUSES, Consts.C2_STATE_BONUSES, Consts.C2_GRADE_BONUSES, Consts.C2_TERM_BONUSES, Consts.C1_WILL_COMPETE_BONUS);
+
+        APIConnection api = new APIConnection(Consts.SCHEME, Consts.HOST, Consts.LISTING_PATH, Consts.CIDF_REAL_TOKEN, Consts.CIDF_REAL_AID, log);
+        Filter filt = new Filter(Consts.CIDF_MIN_INCOME, Consts.CIDF_DTI_INQ_FICO, Consts.CIDF_FICO_INQUIRIES_CHECK, Consts.CIDF_STATE_LOAN_AMOUNT_CHECK, Consts.CIDF_FICO_LOAN_CHECK, params.TERM_SUBGRADE_CHECK, Consts.CIDF_INVALID_GRADES, Consts.CIDF_INVALID_PURPOSES, Consts.CIDF_EMP_LENGTH_MIN, Consts.CIDF_DTI_MAX, Consts.CIDF_DTI_TERM_CHECK, Consts.CIDF_FICO_LOW_THRESHHOLD, isWholeValid, isFractionalValid, is36Valid, is60Valid, params.creditModel);
+	Scorer scorer = new Scorer(Consts.CIDF_INQUIRIES_BONUSES, Consts.CIDF_FICO_BONUSES, Consts.CIDF_USAGE_BONUSES, Consts.CIDF_STATE_BONUSES, Consts.CIDF_GRADE_BONUSES, Consts.CIDF_TERM_BONUSES, Consts.CIDF_WILL_COMPETE_BONUS);
 
         /////////////////////////////////////////////////////////////////////
         /////////		  RETRIEVAL			    /////////
@@ -87,7 +87,7 @@ public class Cirrix1MR extends Cirrix {
             log.info("Filtered. "+initialPool.getLoanCount()+" loans left");
             log.info("No scoring or sorting. We have developed the following prioritized list of "+ initialPool.getLoanCount()+" desirable loans.");
             if (initialPool.getLoanCount()>0) {
-                initialPool.setFractionalRequestAmounts(availableCash, Consts.PARTIAL_FRACTION);
+                initialPool.setRequestAmounts(availableCash);
                 String orderRequest = api.formatOrderRequest(initialPool);
                 log.info("Selected "+initialPool.getLoanCount()+" loans for pre-order");
                 if (orderRequest.contains("loanId")){
@@ -115,7 +115,7 @@ public class Cirrix1MR extends Cirrix {
         AtomicBoolean atomicFlag = new AtomicBoolean(false);
         AtomicInteger atomicLoanCount = new AtomicInteger(0);
 
-        LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, filt, scorer, alreadyOrdered, confirmations, log, contentType, availableCash, Consts.PARTIAL_FRACTION);
+        LoanOrderer orderer = new LoanOrderer(api, retrievalQueue, filt, scorer, alreadyOrdered, confirmations,log, contentType, availableCash);
         Thread retrieverThreadOne = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 1, atomicFlag, atomicLoanCount));
         Thread retrieverThreadTwo = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 2, atomicFlag, atomicLoanCount));
         Thread retrieverThreadThree = new Thread(new LoanRetriever(api, retrievalQueue, Consts.C1_WATCH_ITERATIONS, log, 3, atomicFlag, atomicLoanCount));

@@ -1,15 +1,13 @@
 package arcadia;
 
-import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 public class LoanRetriever implements Runnable{
-    private BlockingQueue<LoanList> queue = null;
+    private BlockingQueue<LoanList> queue;
     final private APIConnection api;
     final private Logger log;
     final private int watchIterations;
