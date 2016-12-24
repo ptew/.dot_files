@@ -12,12 +12,6 @@ function marks {
     ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
 }
 
-export PATH=$PATH:/usr/local/mysql/bin
-export PATH="/Applications/Postgres.app/Contents/Versions/9.4/bin:$PATH"
-export LLVM_CONFIG="/opt/local/bin/llvm-config-mp-3.3"
-
-export VIMRUNTIME=/usr/share/vim/vim73
-
 #ignore hisotry repeats
 export HISTCONTROL=ignoredups:ignorespace
 

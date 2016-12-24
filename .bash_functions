@@ -53,6 +53,7 @@ alias .....="cd ../../../.."
 alias dropbox="cd /Users/ParkerTew/Dropbox"
 alias classes="cd /Users/ParkerTew/Dropbox/classes"
 alias docs="cd /Users/ParkerTew/Dropbox/Documents"
+alias open-pdf="apvlv"
 
 #.p
 alias p='cat ~/.p'

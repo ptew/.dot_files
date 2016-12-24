@@ -18,13 +18,15 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'morhetz/gruvbox'
-
+Plugin 'vim-scripts/CycleColor'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 
-colorscheme molokai 
+syntax enable
+set background=dark
+colorscheme solarized
 
 " make vim normal
 set whichwrap+=<,>,h,l,[,] " wrap scrolling around lines
