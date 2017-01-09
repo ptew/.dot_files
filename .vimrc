@@ -19,14 +19,16 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'morhetz/gruvbox'
 Plugin 'vim-scripts/CycleColor'
+Plugin 'vhda/verilog_systemverilog.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 
 syntax enable
-set background=dark
-colorscheme solarized
+" set background=dark
+" colorscheme solarized
+colorscheme molokai 
 
 " make vim normal
 set whichwrap+=<,>,h,l,[,] " wrap scrolling around lines
@@ -43,7 +45,7 @@ set laststatus=2 " status line
 set shiftwidth=2 " two-space tabs
 set tabstop=2 " two-space tabs
 set autoindent " auto-indent on cr
-set smartindent " indenting is smart!
+" set smartindent " indenting is smart!
 set copyindent " copy previous indent on autoindenting
 set scrolloff=10 " three lines of offset while scrolling
 
@@ -63,3 +65,7 @@ let g:ctrlp_cmd = 'CtrlP'
 " Airline
 let g:airline_theme='luna'
 
+hi Normal ctermbg=none
+hi NonText ctermbg=none
+hi LineNr ctermbg=none
+hi Visual term=reverse cterm=reverse guibg=Grey
