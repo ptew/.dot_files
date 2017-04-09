@@ -1,0 +1,39 @@
+alias la='ls -a'
+alias ll='ls -l'
+alias lla='ls -al'
+alias l='ls -ltr'
+
+#the update command you want
+alias gs='git status'
+alias gd='git diff'
+alias gp='git pull '
+alias gg='git grep '
+alias ga='git add .'
+
+#opens vim in folder view in the current folder
+alias v='vim .'
+
+#a lighter version of vim
+alias vi='vim --noplugin'
+
+#moving around alias
+alias ..='cd ..'
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+alias dropbox="cd /Users/ParkerTew/Dropbox"
+alias classes="cd /Users/ParkerTew/Dropbox/classes"
+alias docs="cd /Users/ParkerTew/Dropbox/Documents"
+alias open-pdf="apvlv"
+
+#Mac to sleep
+alias sleepy='pmset sleepnow'
+
+#Do not disturb
+alias dndoff='open '$HOME'/Library/DoNotDisturb/Disable\ Do\ Not\ Disturb.app'
+alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
+
+# Class alias
+alias arc='ssh vlsifarm-03.mit.edu -l ptew'
+alias lanka='ssh lanka.csail.mit.edu -l ptew'
+
