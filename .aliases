@@ -37,3 +37,5 @@ alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
 alias arc='ssh vlsifarm-03.mit.edu -l ptew'
 alias lanka='ssh lanka.csail.mit.edu -l ptew'
 
+alias update-env="~/.dot_files/update_env.sh"
+alias push-env="~/.dot_files/push_env.sh"
