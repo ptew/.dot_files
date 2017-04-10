@@ -1,5 +1,7 @@
 source ~/.aliases
 
+[[ $TERM != "screen" ]] && exec tmux
+
 if [ -f ~/.git-completion.bash ]; then
 	  . ~/.git-completion.bash
 fi
