@@ -1,0 +1,9 @@
+vim
+google-chrome
+feh
+apvlv
+i3
+tmux
+git
+vundle
+flux
