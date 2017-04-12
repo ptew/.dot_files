@@ -24,7 +24,7 @@ alias .....="cd ../../../.."
 alias dropbox="cd /Users/ParkerTew/Dropbox"
 alias classes="cd /Users/ParkerTew/Dropbox/classes"
 alias docs="cd /Users/ParkerTew/Dropbox/Documents"
-alias open-pdf="apvlv"
+alias open-pdf="okular"
 
 #Mac to sleep
 alias sleepy='pmset sleepnow'
