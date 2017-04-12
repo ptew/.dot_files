@@ -39,3 +39,7 @@ alias lanka='ssh lanka.csail.mit.edu -l ptew'
 
 alias update-env="~/.dot_files/update_env.sh"
 alias push-env="~/.dot_files/push_env.sh"
+
+if [ -f ~/.local_aliases ]; then
+  source ~/.local_aliases
+fi
