@@ -24,3 +24,6 @@ then
     tmux attach-session -t "$ID"
   fi
 fi
+
+# Enable search of history
+bindkey '^R' history-incremental-search-backward
