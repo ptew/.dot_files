@@ -1,5 +1,5 @@
-# load in the files variable from the update script
-source ~/.dot_files/update_env.sh
+# load in the files variable
+source ~/.dot_files/files.sh
 
 for i in ${files[@]}; do
   echo "Updating: " $i

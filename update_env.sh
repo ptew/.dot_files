@@ -1,5 +1,7 @@
+# load in the files variable
+source ~/.dot_files/files.sh
+
 mkdir ~/.old_dot_files
-files=(.aliases .zshrc .bashrc .git-completion.bash .tmux.conf .vimrc)
 
 for i in ${files[@]}; do
   echo "Moving: " $i
