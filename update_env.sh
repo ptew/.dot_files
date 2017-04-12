@@ -1,5 +1,5 @@
 mkdir ~/.old_dot_files
-files=(.aliases .bashrc .git-completion.bash .tmux.conf .vimrc)
+files=(.aliases .zshrc .bashrc .git-completion.bash .tmux.conf .vimrc)
 
 for i in ${files[@]}; do
   echo "Moving: " $i
