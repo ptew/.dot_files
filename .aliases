@@ -26,16 +26,15 @@ alias classes="cd /Users/ParkerTew/Dropbox/classes"
 alias docs="cd /Users/ParkerTew/Dropbox/Documents"
 alias open-pdf="okular"
 
+#spacemacs start
+alias ev='emacs -nw'
+
 #Mac to sleep
 alias sleepy='pmset sleepnow'
 
 #Do not disturb
 alias dndoff='open '$HOME'/Library/DoNotDisturb/Disable\ Do\ Not\ Disturb.app'
 alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
-
-# Class alias
-alias arc='ssh vlsifarm-03.mit.edu -l ptew'
-alias lanka='ssh lanka.csail.mit.edu -l ptew'
 
 alias update-env="~/.dot_files/update_env.sh"
 alias push-env="~/.dot_files/push_env.sh"
