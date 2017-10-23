@@ -1,37 +1,52 @@
-export MARKPATH=$HOME/.marks
-function jump { 
-    cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
-}
-function mark { 
-    mkdir -p $MARKPATH; ln -s $(pwd) $MARKPATH/$1
-}
-function unmark { 
-    rm -i $MARKPATH/$1 
-}
-function marks {
-    ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
+source ~/.aliases
+
+if [ -f ~/.git-completion.bash ]; then
+	  . ~/.git-completion.bash
+fi
+
+#return modifified name or return nothing if no branch
+function git-branch-prompt {
+	  local branch=`git-branch-name`
+	    if [ $branch ]; then printf ":%s " $branch; fi
 }
 
-export PATH=$PATH:/usr/local/mysql/bin
-export PATH="/Applications/Postgres.app/Contents/Versions/9.4/bin:$PATH"
-export LLVM_CONFIG="/opt/local/bin/llvm-config-mp-3.3"
+#rename tab (tabname "lama")
+function tabname {
+	  printf "\e]1;$1\a"
+}
 
-export VIMRUNTIME=/usr/share/vim/vim73
+#rename window (winname "bobby")
+function winname {
+	  printf "\e]2;$1\a"
+}
 
-#ignore hisotry repeats
-export HISTCONTROL=ignoredups:ignorespace
+# Git branch details
+function parse_git_dirty() {
+	        [[ $(git status 2> /dev/null | tail -n1) != *"working directory clean"* ]] && echo "*"
+}
 
-#append to bash history if termianl quits
-shopt -s histappend
+function parse_git_branch() {
+	        git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(parse_git_dirty)/"
+}
 
-#allows color in the terminal
-export CLICOLOR=1
-
-#import my file with all bash functions
-source ~/.bash_functions
-
-#Mac ls colors
-export LSCOLORS=GxFxCxDxBxegedabagaced
-
-#adds mark jump command to terminal
-source ~/.marksrc
+#one size fits all extract
+extract () {
+	   if [ -f $1 ] ; then
+	   case $1 in
+	   *.tar.bz2)   tar xvjf "$@";;
+	   *.tar.gz)    tar xvzf "$@";;
+	   *.bz2)       bunzip2 "$@";;
+	   *.rar)       unrar "$@";;
+	   *.gz)        gunzip "$@";;
+	   *.tar)       tar xvf "$@";;
+	   *.tbz2)      tar xvjf "$@";;
+	   *.tgz)       tar xvzf "$@";;
+	   *.zip)       unzip "$@";;
+	   *.Z)         uncompress "$@";;
+	   *.7z)        7z x "$@";;
+	   *)           echo "don't know how to extract '$1'..." ;;
+	   esac
+	   else
+	   echo "'$1' is not a valid file!"
+	   fi
+}

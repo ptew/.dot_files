@@ -19,3 +19,6 @@ source ~/.bashrc
 # The orginal version is saved in .bash_profile.pysave
 PATH="/Library/Frameworks/Python.framework/Versions/3.4/bin:${PATH}"
 export PATH
+
+# added by Anaconda2 4.3.0 installer
+export PATH="/Users/ParkerTew/anaconda2/bin:$PATH"

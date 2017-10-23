@@ -1,4 +1,34 @@
-colorscheme darkblue
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+Plugin 'tpope/vim-fugitive'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'morhetz/gruvbox'
+Plugin 'vim-scripts/CycleColor'
+Plugin 'vhda/verilog_systemverilog.vim'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+syntax enable
+" set background=dark
+" colorscheme solarized
+colorscheme molokai 
 
 " make vim normal
 set whichwrap+=<,>,h,l,[,] " wrap scrolling around lines
@@ -15,7 +45,7 @@ set laststatus=2 " status line
 set shiftwidth=2 " two-space tabs
 set tabstop=2 " two-space tabs
 set autoindent " auto-indent on cr
-set smartindent " indenting is smart!
+" set smartindent " indenting is smart!
 set copyindent " copy previous indent on autoindenting
 set scrolloff=10 " three lines of offset while scrolling
 
@@ -27,3 +57,15 @@ syntax on " syntax highlighting on
 filetype plugin indent on
 
 let b:verilog_indent_modules = 1
+
+" Ctrlp
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+
+" Airline
+let g:airline_theme='luna'
+
+hi Normal ctermbg=none
+hi NonText ctermbg=none
+hi LineNr ctermbg=none
+hi Visual term=reverse cterm=reverse guibg=Grey

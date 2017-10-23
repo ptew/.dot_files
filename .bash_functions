@@ -13,11 +13,6 @@ function tabname {
 	  printf "\e]1;$1\a"
 }
 
-#rename window (winname "bobby")
-function winname {
-	  printf "\e]2;$1\a"
-}
-
 # Git branch details
 function parse_git_dirty() {
 	        [[ $(git status 2> /dev/null | tail -n1) != *"working directory clean"* ]] && echo "*"
@@ -68,9 +63,12 @@ alias dickbutt='cat '$HOME'/.dickbutt'
 
 alias mlb=HOME'/.mlb'
 
+#alias python='/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
+
 # Class alias
-alias arc='ssh vlsifarm-03.mit.edu -l ptew'
-alias lanka='ssh lanka.csail.mit.edu -l ptew'
+alias arc='ssh -o ServerAliveInterval=100 vlsifarm-05.mit.edu -l ptew'
+alias lanka='ssh -o ServerAliveInterval=100 lanka.csail.mit.edu -l ptew'
+alias vizlanka='ssh -R 10000:127.0.0.1:10000 lanka.csail.mit.edu -l ptew'
 
 #one size fits all extract
 extract () {
