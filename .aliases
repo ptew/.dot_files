@@ -34,7 +34,6 @@ alias sleepy='pmset sleepnow'
 alias dndoff='open '$HOME'/Library/DoNotDisturb/Disable\ Do\ Not\ Disturb.app'
 alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
 
-alias update-env="~/.dot_files/update_env.sh"
 alias push-env="~/.dot_files/push_env.sh"
 
 if [ -f ~/.local_aliases ]; then
