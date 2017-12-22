@@ -9,5 +9,3 @@ for i in ${files[@]}; do
   echo "Linking: " $i
   ln -s ~/.dot_files/$i ~/$i
 done
-
-source ~/$RCFILE
