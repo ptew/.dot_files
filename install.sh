@@ -6,8 +6,8 @@ mkdir ~/.old_dot_files
 for i in ${files[@]}; do
   echo "Moving: " $i
   mv ~/$i ~/.old_dot_files
-  echo "Copying: " $i
-  cp  ~/.dot_files/$i ~
+  echo "Linking: " $i
+  ln -s ~/.dot_files/$i ~/$i
 done
 
-source ~/.bashrc
+source ~/$RCFILE
