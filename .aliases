@@ -35,6 +35,7 @@ alias dndoff='open '$HOME'/Library/DoNotDisturb/Disable\ Do\ Not\ Disturb.app'
 alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
 
 alias push-env="~/.dot_files/push_env.sh"
+alias commit-env="~/.dot_files/commit.sh"
 
 if [ -f ~/.local_aliases ]; then
   source ~/.local_aliases
