@@ -1,6 +1,4 @@
-alias la='ls -a'
-alias ll='ls -l'
-alias lla='ls -al'
+alias la='ls -lta'
 alias l='ls -ltr'
 
 #the update command you want
