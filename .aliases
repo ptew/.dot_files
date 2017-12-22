@@ -25,7 +25,7 @@ alias docs="cd /Users/ParkerTew/Dropbox/Documents"
 alias open-pdf="okular"
 
 #spacemacs start
-alias ev='emacs -nw'
+alias emacs='emacs -nw'
 
 #Mac to sleep
 alias sleepy='pmset sleepnow'
