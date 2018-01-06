@@ -1,3 +1,5 @@
+source ~/.pii-config
+
 alias la='ls -lta'
 alias l='ls -ltr'
 
@@ -24,6 +26,9 @@ alias classes="cd /Users/ParkerTew/Dropbox/classes"
 alias docs="cd /Users/ParkerTew/Dropbox/Documents"
 alias open-pdf="okular"
 
+alias ggit="cd $DEV_DIR"
+alias dots="cd $DOT_DIR"
+
 #spacemacs start
 alias emacs='emacs -nw'
 
@@ -34,8 +39,8 @@ alias sleepy='pmset sleepnow'
 alias dndoff='open '$HOME'/Library/DoNotDisturb/Disable\ Do\ Not\ Disturb.app'
 alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
 
-alias push-env="~/.dot_files/push_env.sh"
-alias commit-env="~/.dot_files/commit.sh"
+alias push-env="$DOT_DIR/push_env.sh"
+alias commit-env="$DOT_DIR/commit.sh"
 
 if [ -f ~/.local_aliases ]; then
   source ~/.local_aliases

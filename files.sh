@@ -1,4 +1,4 @@
-files=(.aliases .zshrc .git-completion.bash .tmux.conf .vimrc .spacemacs)
+files=(.aliases .zshrc .git-completion.bash .pii-config .tmux.conf .vimrc .spacemacs)
 
 # Excluded:
 # .bashrc
