@@ -41,6 +41,7 @@ alias dnd='open '$HOME'/Library/DoNotDisturb/Enable\ Do\ Not\ Disturb.app'
 
 alias push-env="$DOT_DIR/push_env.sh"
 alias commit-env="$DOT_DIR/commit.sh"
+alias update-env="$DOT_DIR/update_env.sh"
 
 if [ -f ~/.local_aliases ]; then
   source ~/.local_aliases
