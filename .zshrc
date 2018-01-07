@@ -27,3 +27,5 @@ fi
 
 # Enable search of history
 bindkey '^R' history-incremental-search-backward
+
+export PS1="%m:%~ %% "
