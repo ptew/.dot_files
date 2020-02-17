@@ -29,3 +29,8 @@ fi
 bindkey '^R' history-incremental-search-backward
 
 export PS1="%m:%~ %% "
+
+bindkey "^D" backward-word
+bindkey "^C" forward-word
+bindkey "^a" beginning-of-line
+bindkey "^e" end-of-line
